@@ -1,0 +1,3827 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動くLINE絵文字の作り方ガイド【Codex用プロンプト付き】</title>
+<style>
+  :root{
+    --primary:#dd9db4;
+    --primary-d:#b8637f;
+    --secondary:#e3b98c;
+    --accent:#f0b88a;
+    --cream:#fdf5f0;
+    --card:#ffffff;
+    --ink:#333333;
+    --ink-2:#6b7280;
+    --ink-3:#9ca3af;
+    --line:#f0dcd3;
+    --dark:#3a2f34;
+    --dark-2:#453a3f;
+    --line-green:#06C755;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:"Hiragino Maru Gothic ProN","Zen Maru Gothic","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",Meiryo,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.85;
+  }
+
+  .shell{
+    max-width:640px;
+    margin:0 auto;
+    background:var(--card);
+    box-shadow:0 0 60px -20px rgba(80,55,60,.25);
+    overflow:hidden;
+    min-height:100vh;
+  }
+
+  section{padding:48px 22px;}
+
+  /* ---------- 共通パーツ ---------- */
+  .pill{
+    display:inline-block;
+    background:var(--primary);
+    color:#fff;
+    font-weight:800;
+    font-size:12.5px;
+    padding:5px 16px;
+    border-radius:999px;
+    box-shadow:0 4px 10px -4px rgba(221,157,180,.7);
+  }
+  .pill-soft{
+    display:inline-block;
+    background:rgba(240,184,138,.16);
+    color:#c17a4a;
+    font-weight:800;
+    font-size:12.5px;
+    padding:5px 14px;
+    border-radius:999px;
+  }
+
+  .sec-head{ text-align:center; margin-bottom:26px; }
+  .sec-head h2{
+    font-size:clamp(20px,5.2vw,24px);
+    font-weight:800;
+    margin:0;
+    line-height:1.5;
+  }
+  .sec-head .lead{
+    font-size:13.5px;
+    color:var(--ink-2);
+    margin:14px 0 0;
+    line-height:1.9;
+  }
+
+  .step-label{
+    display:block;
+    font-size:34px;
+    font-weight:900;
+    letter-spacing:.02em;
+    background:linear-gradient(135deg,#e8b98f 0%,#f3cba0 95%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:#e8b98f;
+    margin-bottom:2px;
+    line-height:1.2;
+  }
+
+  .note-yellow{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:#fffbeb;
+    border:1px solid #fdeec4;
+    border-radius:14px;
+    padding:15px 16px;
+    margin-top:18px;
+  }
+  .note-yellow .ico{ font-size:20px; line-height:1.3; flex-shrink:0; }
+  .note-yellow p{ margin:0; font-size:13px; line-height:1.85; color:#5c5344; }
+
+  .note-soft{
+    background:rgba(240,184,138,.11);
+    border:1px solid rgba(240,184,138,.3);
+    border-radius:14px;
+    padding:15px 16px;
+    margin-top:18px;
+    text-align:center;
+  }
+  .note-soft p{ margin:0; font-size:13px; line-height:1.9; color:#6b5a3c; }
+
+  .callout-white{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 18px;
+    margin-top:18px;
+    box-shadow:0 6px 18px -14px rgba(80,55,60,.5);
+  }
+  .callout-white p{ margin:0; font-size:13px; line-height:1.9; color:#4b5563; }
+
+  strong{ font-weight:800; }
+  .c-primary{ color:var(--primary-d); }
+  .c-red{ color:#e23b3b; }
+
+  /* ---------- ヘッダー ---------- */
+  header.hero{
+    background:linear-gradient(150deg,#fdf1ec 0%,#fdf3ee 100%);
+    padding:38px 22px 46px;
+    text-align:center;
+    border-bottom-left-radius:32px;
+    border-bottom-right-radius:32px;
+    position:relative;
+    overflow:hidden;
+  }
+  .float-emoji{
+    position:absolute;
+    font-size:30px;
+    animation:float 4s ease-in-out infinite;
+    opacity:.9;
+  }
+  @keyframes float{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-10px); }
+  }
+  header.hero .e1{ top:16px; right:20px; }
+  header.hero .e2{ top:22px; left:20px; font-size:24px; animation-delay:.8s; }
+
+  header.hero .pre{
+    font-size:13px;
+    color:var(--ink-2);
+    font-weight:700;
+    margin:16px 0 8px;
+  }
+  header.hero h1{
+    font-size:clamp(25px,6.6vw,33px);
+    font-weight:900;
+    line-height:1.42;
+    margin:0 0 16px;
+    color:#3b3b3b;
+  }
+  header.hero h1 .main{ display:block; color:var(--primary-d); }
+  header.hero h1 .sub{
+    display:block;
+    font-size:.55em;
+    color:var(--ink-2);
+    font-weight:800;
+    margin-top:10px;
+  }
+
+  /* ---------- 動くサンプル ---------- */
+  .demo-strip{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:22px;
+  }
+  .demo-chip{
+    width:64px;height:64px;
+    border-radius:18px;
+    background:#fff;
+    border:1px solid var(--line);
+    box-shadow:0 8px 18px -14px rgba(80,55,60,.8);
+    display:flex;align-items:center;justify-content:center;
+    font-size:29px;
+  }
+  .demo-chip.a{ animation:puru 1s ease-in-out infinite; }
+  .demo-chip.b{ animation:pyon 1.1s ease-in-out infinite; }
+  .demo-chip.c{ animation:yura 1.6s ease-in-out infinite; }
+  .demo-chip.d{ animation:kira 1.4s ease-in-out infinite; }
+  @keyframes puru{ 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
+  @keyframes pyon{ 0%,100%{transform:translateY(0)} 40%{transform:translateY(-9px)} 60%{transform:translateY(0)} }
+  @keyframes yura{ 0%,100%{transform:rotate(-7deg)} 50%{transform:rotate(7deg)} }
+  @keyframes kira{ 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.18);opacity:.75} }
+  .demo-note{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-3);
+    margin:12px 0 0;
+  }
+
+  /* ---------- 悩み ---------- */
+  .worry-box{
+    background:rgba(253,241,236,.6);
+    border:1px solid #f0d9cd;
+    border-radius:24px;
+    padding:26px 20px 24px;
+    position:relative;
+  }
+  .worry-box > .float-emoji{ top:-14px; left:-4px; font-size:32px; }
+  .worry-box h3{
+    text-align:center;
+    font-size:17.5px;
+    font-weight:800;
+    margin:6px 0 20px;
+  }
+  .worry-list{ list-style:none; margin:0 0 20px; padding:0; }
+  .worry-list li{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:#fff;
+    border:1px solid #f5f5f5;
+    border-radius:16px;
+    padding:14px 15px;
+    margin-bottom:12px;
+    box-shadow:0 4px 12px -10px rgba(80,55,60,.6);
+  }
+  .worry-list li:last-child{ margin-bottom:0; }
+  .worry-list .ico{ font-size:21px; line-height:1.4; flex-shrink:0; }
+  .worry-list span.txt{ font-size:13.5px; line-height:1.8; color:#4b5563; }
+
+  .worry-bridge{
+    font-size:13px;
+    color:var(--ink-2);
+    line-height:1.9;
+    margin:0 0 20px;
+  }
+
+  .worry-answer{
+    background:#fff;
+    border:2px solid rgba(221,157,180,.25);
+    border-radius:18px;
+    padding:20px 18px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .worry-answer .bg-ico{
+    position:absolute;
+    right:-10px; bottom:-16px;
+    font-size:64px;
+    opacity:.08;
+  }
+  .worry-answer .t{ position:relative; font-weight:800; margin:0 0 8px; font-size:14.5px; }
+  .worry-answer .t .big{ color:var(--primary-d); font-size:20px; display:inline-block; margin-top:4px; }
+  .worry-answer .d{ position:relative; margin:0; font-size:13px; color:#5b6472; line-height:1.9; }
+
+  /* ---------- 全体フロー ---------- */
+  .flow-overview{
+    position:relative;
+    max-width:330px;
+    margin:0 auto;
+  }
+  .flow-overview::before{
+    content:"";
+    position:absolute;
+    left:23px; top:24px; bottom:24px;
+    border-left:2px dashed rgba(221,157,180,.35);
+  }
+  .flow-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .flow-row:last-child{ margin-bottom:0; }
+  .flow-dot{
+    width:48px;height:48px;
+    flex-shrink:0;
+    border-radius:50%;
+    background:#fff;
+    border:2px solid rgba(221,157,180,.35);
+    display:flex;align-items:center;justify-content:center;
+    font-size:21px;
+    position:relative;z-index:1;
+  }
+  .flow-row .lbl{ font-size:13.5px; font-weight:800; color:#4b5563; }
+  .flow-row .lbl small{ display:block; font-weight:600; font-size:11.5px; color:var(--ink-3); margin-top:1px; }
+
+  /* ---------- 準備リスト ---------- */
+  .prep{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px 18px;
+    box-shadow:0 8px 22px -18px rgba(80,55,60,.6);
+  }
+  .prep .ttl{
+    font-weight:800;
+    font-size:14px;
+    text-align:center;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:14px;
+  }
+  .prep ul{ list-style:none; margin:0; padding:0; }
+  .prep li{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:10px 0;
+    border-bottom:1px dashed #f5e6dd;
+    font-size:13px;
+    line-height:1.8;
+    color:#4b5563;
+  }
+  .prep li:last-child{ border-bottom:0; padding-bottom:0; }
+  .prep li .ico{ font-size:19px; flex-shrink:0; line-height:1.5; }
+  .prep li b{ display:block; color:var(--ink); font-size:13.5px; }
+
+  /* ---------- 手順ミニステップ ---------- */
+  .mini-steps{ list-style:none; margin:24px 0 0; padding:0; counter-reset:mini; }
+  .mini{
+    position:relative;
+    padding-left:44px;
+    padding-bottom:26px;
+  }
+  .mini:last-child{ padding-bottom:0; }
+  .mini::before{
+    counter-increment:mini;
+    content:counter(mini);
+    position:absolute;
+    left:0; top:0;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    font-size:14px;
+    font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+    z-index:1;
+  }
+  .mini:not(:last-child)::after{
+    content:"";
+    position:absolute;
+    left:14px; top:34px; bottom:4px;
+    border-left:2px dotted rgba(221,157,180,.35);
+  }
+  .mini h4{
+    margin:2px 0 8px;
+    font-size:15px;
+    font-weight:800;
+    line-height:1.5;
+  }
+  .mini p{
+    margin:0;
+    font-size:13px;
+    line-height:1.9;
+    color:#5b6472;
+  }
+  .mini p + p{ margin-top:9px; }
+
+  /* ---------- 公式サイトへのボタン ---------- */
+  .ext-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    max-width:400px;
+    margin:24px auto 0;
+    background:linear-gradient(160deg,var(--primary),var(--primary-d));
+    color:#fff;
+    text-decoration:none;
+    border-radius:18px;
+    padding:16px 18px;
+    box-shadow:0 14px 30px -14px rgba(184,99,127,.85);
+    transition:transform .15s, filter .2s;
+  }
+  .ext-btn:active{ transform:scale(.97); filter:brightness(.96); }
+  @media (hover:hover){
+    .ext-btn:hover{ filter:brightness(1.06); }
+  }
+  .ext-btn .tap{
+    font-size:11.5px;
+    font-weight:700;
+    background:rgba(255,255,255,.22);
+    border-radius:999px;
+    padding:2px 14px;
+    margin-bottom:7px;
+  }
+  .ext-btn .main{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:15.5px;
+    font-weight:900;
+    text-align:center;
+    line-height:1.5;
+  }
+  .ext-btn .main svg{ width:17px;height:17px;flex-shrink:0; }
+  .ext-note{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-3);
+    margin:10px 0 0;
+    line-height:1.8;
+  }
+
+  /* ---------- 大プロンプト ---------- */
+  .prompt-wrap{
+    background:var(--dark);
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 16px 36px -22px rgba(0,0,0,.85);
+  }
+  .prompt-wrap .bar{
+    background:var(--dark-2);
+    padding:13px 15px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .prompt-wrap .bar .cap{
+    font-size:12px;
+    font-weight:800;
+    color:#cfd6e2;
+  }
+  .copy-big{
+    border:0;
+    background:var(--primary);
+    color:#fff;
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:800;
+    border-radius:999px;
+    padding:8px 18px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    box-shadow:0 6px 14px -8px rgba(221,157,180,.9);
+    transition:background .18s, transform .12s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .copy-big:hover{ background:var(--primary-d); }
+  .copy-big:active{ transform:scale(.96); }
+  .copy-big svg{ width:14px;height:14px; }
+
+  .prompt-body{
+    margin:0;
+    padding:16px 16px 18px;
+    max-height:340px;
+    overflow-y:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:11.5px;
+    line-height:1.85;
+    color:#d8dee8;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .prompt-scroll-hint{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-3);
+    margin:10px 0 0;
+  }
+
+  /* ---------- 対話フローチャート ---------- */
+  .chart{ margin-top:8px; }
+  .chart-node{
+    background:#fff;
+    border:1px solid var(--line);
+    border-left:4px solid var(--primary);
+    border-radius:14px;
+    padding:14px 16px;
+    box-shadow:0 6px 18px -16px rgba(80,55,60,.7);
+  }
+  .chart-node .qn{
+    display:block;
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:.12em;
+    color:var(--primary-d);
+    margin-bottom:4px;
+  }
+  .chart-node h4{
+    margin:0 0 6px;
+    font-size:14.5px;
+    font-weight:800;
+    line-height:1.5;
+  }
+  .chart-node p{
+    margin:0;
+    font-size:12.5px;
+    line-height:1.85;
+    color:#5b6472;
+  }
+  .chart-node .choices{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-top:10px;
+  }
+  .chart-node .choices span{
+    background:#fbeef0;
+    border:1px solid rgba(221,157,180,.3);
+    color:#a85f78;
+    font-size:11.5px;
+    font-weight:800;
+    border-radius:999px;
+    padding:3px 11px;
+  }
+  .chart-arrow{
+    text-align:center;
+    color:rgba(221,157,180,.55);
+    font-size:17px;
+    line-height:1;
+    padding:8px 0;
+  }
+  .chart-node.auto{
+    border-left-color:var(--secondary);
+    background:#fdf3ef;
+  }
+  .chart-node.auto .qn{ color:#b5637f; }
+  .chart-node.auto .choices span{
+    background:#fff;
+    border-color:rgba(227,185,140,.4);
+    color:#b5637f;
+  }
+
+  /* ---------- 仕様表 ---------- */
+  .spec-table{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 8px 22px -18px rgba(80,55,60,.6);
+  }
+  .spec-table .row{
+    display:flex;
+    gap:12px;
+    padding:12px 16px;
+    border-bottom:1px solid #fdf3ee;
+    font-size:12.5px;
+    line-height:1.75;
+  }
+  .spec-table .row:last-child{ border-bottom:0; }
+  .spec-table .row:nth-child(odd){ background:#fdf7f3; }
+  .spec-table .k{
+    flex:0 0 96px;
+    font-weight:800;
+    color:var(--primary-d);
+  }
+  .spec-table .v{ color:#4b5563; }
+  .spec-table .v em{ font-style:normal; font-weight:800; color:var(--ink); }
+
+  /* ---------- 申請ステップ ---------- */
+  .apply-list{ list-style:none; margin:0; padding:0; counter-reset:ap; }
+  .apply-list > li{
+    position:relative;
+    padding-left:40px;
+    padding-bottom:22px;
+  }
+  .apply-list > li:last-child{ padding-bottom:0; }
+  .apply-list > li::before{
+    counter-increment:ap;
+    content:counter(ap);
+    position:absolute;
+    left:0; top:1px;
+    width:27px;height:27px;
+    border-radius:50%;
+    background:rgba(227,185,140,.15);
+    border:1.5px solid rgba(227,185,140,.5);
+    color:#b5637f;
+    font-size:13px;
+    font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+    z-index:1;
+  }
+  .apply-list > li:not(:last-child)::after{
+    content:"";
+    position:absolute;
+    left:13px; top:31px; bottom:2px;
+    border-left:2px dotted rgba(227,185,140,.3);
+  }
+  .apply-list h4{
+    margin:1px 0 6px;
+    font-size:14.5px;
+    font-weight:800;
+    line-height:1.5;
+  }
+  .apply-list p{
+    margin:0;
+    font-size:12.5px;
+    line-height:1.9;
+    color:#5b6472;
+  }
+  .apply-list p + p{ margin-top:8px; }
+
+  /* ---------- つまずきポイント ---------- */
+  .trap{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 17px;
+    margin-bottom:13px;
+    box-shadow:0 6px 18px -16px rgba(80,55,60,.7);
+  }
+  .trap:last-child{ margin-bottom:0; }
+  .trap .q{
+    display:flex;
+    gap:9px;
+    align-items:flex-start;
+    font-size:13.5px;
+    font-weight:800;
+    line-height:1.7;
+    margin:0 0 9px;
+  }
+  .trap .q .ico{ flex-shrink:0; line-height:1.4; }
+  .trap .a{
+    margin:0;
+    font-size:12.5px;
+    line-height:1.9;
+    color:#5b6472;
+    padding-top:9px;
+    border-top:1px dashed #f2e0d8;
+  }
+
+  /* ---------- スマホルート ---------- */
+  .phone-sec{
+    background:linear-gradient(180deg,#fdf4ef 0%,#ffffff 100%);
+    border-top:1px solid rgba(227,185,140,.35);
+  }
+  .phone-sec .step-label{
+    background:linear-gradient(135deg,#e3b98c 0%,#e8c9a0 95%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:#e3b98c;
+  }
+  .phone-sec .prompt-wrap .bar .cap{ color:#f5e3da; }
+  .phone-sec .copy-big{
+    background:#d98fa8;
+    box-shadow:0 6px 14px -8px rgba(217,143,168,.9);
+  }
+  .phone-sec .copy-big:hover{ background:#b5637f; }
+  .phone-sec .note-soft{
+    background:rgba(227,185,140,.1);
+    border-color:rgba(227,185,140,.3);
+  }
+  .phone-sec .note-soft p{ color:#7a5048; }
+  .phone-sec .callout-white p strong{ color:#b5637f; }
+
+  .talk{ max-width:420px; margin:24px auto 0; }
+  .talk-row{ display:flex; margin-bottom:12px; }
+  .talk-row.me{ justify-content:flex-end; }
+  .talk-bubble{
+    max-width:78%;
+    font-size:13px;
+    line-height:1.75;
+    padding:11px 14px;
+    border-radius:16px;
+    background:#fff;
+    border:1px solid var(--line);
+    color:#4b5563;
+    box-shadow:0 6px 16px -14px rgba(80,55,60,.8);
+  }
+  .talk-row.me .talk-bubble{
+    background:var(--line-green);
+    border-color:var(--line-green);
+    color:#fff;
+    font-weight:800;
+  }
+  .talk-bubble b{ color:var(--ink); font-weight:800; }
+  .talk-row.me .talk-bubble b{ color:#fff; }
+  .talk-more{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-3);
+    margin:2px 0 0;
+  }
+
+  .route-link{
+    display:block;
+    margin-top:14px;
+    background:#fdf4ef;
+    border:1px solid rgba(227,185,140,.45);
+    border-radius:14px;
+    padding:13px 15px;
+    text-decoration:none;
+    color:#b5637f;
+    font-size:12.5px;
+    font-weight:800;
+    line-height:1.75;
+    text-align:center;
+  }
+  .route-link span{ display:block; font-weight:600; color:#8a6b60; font-size:11.5px; margin-top:3px; }
+
+  /* ---------- ダークセクション ---------- */
+  .dark-sec{
+    background:var(--dark);
+    color:#e6eaf2;
+    padding:48px 22px;
+    text-align:center;
+  }
+  .dark-sec h2{
+    font-size:clamp(19px,5vw,22px);
+    font-weight:800;
+    margin:0 0 20px;
+    color:#fff;
+    line-height:1.5;
+  }
+  .dark-sec .body{
+    font-size:13.5px;
+    line-height:2;
+    color:#c8cedb;
+    max-width:470px;
+    margin:0 auto 22px;
+    text-align:left;
+  }
+  .dark-sec .body b{ color:#fff; }
+  .dark-sec .body .u{
+    color:#fff;
+    font-weight:800;
+    border-bottom:2px solid var(--primary);
+    padding-bottom:1px;
+  }
+  .dark-sec ul{
+    list-style:none;
+    margin:0 auto 22px;
+    padding:0;
+    max-width:470px;
+    text-align:left;
+  }
+  .dark-sec ul li{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:13px;
+    padding:12px 14px;
+    margin-bottom:10px;
+    font-size:13px;
+    line-height:1.8;
+    color:#dbe1ec;
+  }
+  .dark-sec ul li:last-child{ margin-bottom:0; }
+  .dark-sec ul li .ico{ color:var(--primary); font-size:16px; flex-shrink:0; line-height:1.5; }
+  .dark-sec .closing{ font-size:13.5px; color:#c8cedb; margin:0; }
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:linear-gradient(180deg,#fdf1ec 0%,#fdf6f0 100%);
+    padding:48px 22px 54px;
+  }
+  .cta-badge-wrap{ text-align:center; margin-bottom:20px; }
+  .cta-badge{
+    display:inline-block;
+    background:#fff;
+    border:2px solid var(--primary);
+    color:var(--primary-d);
+    font-size:13px;
+    font-weight:800;
+    line-height:1.7;
+    padding:10px 20px;
+    border-radius:22px;
+    box-shadow:0 6px 16px -12px rgba(80,55,60,.8);
+    animation:bounceSlow 2.6s ease-in-out infinite;
+  }
+  @keyframes bounceSlow{
+    0%,100%{ transform:translateY(-3px); }
+    50%{ transform:translateY(0); }
+  }
+
+  .cta-hook{
+    max-width:470px;
+    margin:0 auto 26px;
+    background:rgba(255,247,214,.55);
+    border:1px solid #fbeab4;
+    border-radius:18px;
+    padding:18px 18px;
+    text-align:center;
+    font-size:14px;
+    font-weight:800;
+    line-height:1.9;
+    color:#4b4335;
+  }
+  .cta-hook .big{
+    display:block;
+    color:var(--primary-d);
+    font-size:18px;
+    margin-top:8px;
+    line-height:1.6;
+  }
+
+  .cta-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:24px;
+    padding:26px 20px;
+    max-width:470px;
+    margin:0 auto 30px;
+    box-shadow:0 18px 40px -26px rgba(80,55,60,.7);
+    position:relative;
+  }
+  .cta-card .tag{
+    position:absolute;
+    top:-13px; right:16px;
+    background:#ef4444;
+    color:#fff;
+    font-size:11px;
+    font-weight:800;
+    padding:4px 12px;
+    border-radius:999px;
+    box-shadow:0 6px 14px -8px rgba(239,68,68,.9);
+  }
+  .cta-card h3{
+    text-align:center;
+    font-size:20px;
+    font-weight:900;
+    margin:6px 0 18px;
+  }
+  .cta-card .inner{
+    background:#fdf7f3;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px 16px;
+  }
+  .cta-card .inner .t{
+    text-align:center;
+    font-weight:800;
+    font-size:13px;
+    padding-bottom:10px;
+    border-bottom:1px solid #f5e6dd;
+    margin:0 0 14px;
+  }
+  .cta-card .inner ul{ list-style:none; margin:0; padding:0; }
+  .cta-card .inner li{
+    display:flex;
+    gap:9px;
+    align-items:flex-start;
+    font-size:12.5px;
+    line-height:1.8;
+    color:#4b5563;
+    margin-bottom:10px;
+  }
+  .cta-card .inner li:last-child{ margin-bottom:0; }
+  .cta-card .inner li .ico{ flex-shrink:0; line-height:1.5; }
+  .cta-card .after{
+    margin:18px 0 0;
+    font-size:12.5px;
+    line-height:1.9;
+    color:#5b6472;
+  }
+
+  .cta-tail{ max-width:470px; margin:0 auto; text-align:center; }
+  .cta-tail .lead{
+    font-size:13px;
+    line-height:1.95;
+    color:#5b6472;
+    margin:0 0 22px;
+  }
+  .cta-tail .lead .em{
+    display:inline-block;
+    margin-top:12px;
+    background:rgba(255,255,255,.8);
+    border-radius:10px;
+    padding:8px 12px;
+    color:var(--primary-d);
+    font-weight:800;
+    font-size:13.5px;
+    box-shadow:0 4px 12px -10px rgba(80,55,60,.8);
+  }
+
+  .line-btn{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    background:var(--line-green);
+    color:#fff;
+    text-decoration:none;
+    border-radius:18px;
+    padding:15px 18px;
+    box-shadow:0 16px 32px -14px rgba(6,199,85,.75);
+    position:relative;
+    overflow:hidden;
+    animation:bounceSlow 2.6s ease-in-out infinite;
+    transition:transform .15s, filter .2s;
+  }
+  .line-btn:active{ transform:scale(.97); filter:brightness(.96); }
+  @media (hover:hover){
+    .line-btn:hover{ filter:brightness(1.05); }
+  }
+  .line-btn .tap{
+    font-size:11.5px;
+    font-weight:700;
+    background:rgba(255,255,255,.22);
+    border-radius:999px;
+    padding:2px 14px;
+    margin-bottom:7px;
+  }
+  .line-btn .main{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-size:16.5px;
+    font-weight:900;
+  }
+  .line-btn .main svg{ width:23px;height:23px;flex-shrink:0; }
+
+  .cta-fine{
+    margin:14px 0 0;
+    font-size:11px;
+    line-height:1.8;
+    color:#7c8391;
+    text-align:left;
+    background:rgba(255,255,255,.55);
+    border-radius:10px;
+    padding:11px 13px;
+  }
+
+  /* ---------- フッター ---------- */
+  footer{
+    background:#fff;
+    border-top:1px solid var(--line);
+    padding:30px 22px;
+    text-align:center;
+  }
+  footer p{ margin:0 0 5px; font-size:11.5px; color:var(--ink-3); }
+  footer .f-nav{
+    margin-top:14px; display:flex; flex-wrap:wrap; gap:6px 16px; justify-content:center;
+  }
+  footer .f-nav a{
+    font-size:12px; font-weight:700; color:#b5637f; text-decoration:none;
+  }
+  footer .f-nav a:hover{ text-decoration:underline; }
+
+  /* ---------- トースト ---------- */
+  #toast{
+    position:fixed;
+    top:18px; left:50%;
+    transform:translateX(-50%);
+    background:var(--dark);
+    color:#fff;
+    font-size:13px;
+    font-weight:800;
+    padding:11px 22px;
+    border-radius:999px;
+    box-shadow:0 12px 28px -12px rgba(0,0,0,.7);
+    z-index:99;
+    display:none;
+    align-items:center;
+    gap:8px;
+  }
+  #toast.show{ display:flex; animation:toastPop 2s ease-in-out; }
+  #toast svg{ width:17px;height:17px;color:#e3b98c;flex-shrink:0; }
+  @keyframes toastPop{
+    0%{ opacity:0; transform:translate(-50%,10px); }
+    15%{ opacity:1; transform:translate(-50%,0); }
+    85%{ opacity:1; transform:translate(-50%,0); }
+    100%{ opacity:0; transform:translate(-50%,-10px); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+
+  @media (min-width:600px){
+    section{ padding:56px 32px; }
+    header.hero{ padding:44px 32px 52px; }
+    .dark-sec, .cta{ padding:64px 32px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toastText">コピーしました！</span>
+</div>
+
+<div class="shell">
+
+  <!-- ============ ヘッダー ============ -->
+  <header class="hero">
+    <span class="float-emoji e1">✨</span>
+    <span class="float-emoji e2">💬</span>
+
+    <span class="pill">2026年最新版</span>
+
+    <p class="pre">絵が描けなくても、パソコン用語が分からなくても</p>
+
+    <h1>
+      <span class="main">動くLINE絵文字の作り方ガイド</span>
+      <span class="sub">＋Codexにまるごと任せるプロンプト</span>
+    </h1>
+
+    <div class="demo-strip" aria-hidden="true">
+      <span class="demo-chip a">😊</span>
+      <span class="demo-chip b">🙌</span>
+      <span class="demo-chip c">🥺</span>
+      <span class="demo-chip d">✨</span>
+    </div>
+    <p class="demo-note">↑ こんなふうに「動く」のがアニメーション絵文字です</p>
+  </header>
+
+  <!-- ============ 悩み ============ -->
+  <section>
+    <div class="worry-box">
+      <span class="float-emoji">🫧</span>
+
+      <h3>こんなところで止まっていませんか？</h3>
+
+      <ul class="worry-list">
+        <li>
+          <span class="ico">😰</span>
+          <span class="txt">作ってみたい気持ちはあるけれど、そもそも<strong>絵が描けない</strong></span>
+        </li>
+        <li>
+          <span class="ico">😵</span>
+          <span class="txt">調べたら「APNG」「フレーム数」と出てきて、<strong>1行目で心が折れた</strong></span>
+        </li>
+        <li>
+          <span class="ico">😖</span>
+          <span class="txt">静止画の絵文字は出せたのに、<strong>動かし方だけ分からない</strong></span>
+        </li>
+        <li>
+          <span class="ico">🥲</span>
+          <span class="txt">サイズや容量が合わずに、<strong>申請ではじかれてしまった</strong></span>
+        </li>
+      </ul>
+
+      <p class="worry-bridge">
+        動く絵文字がむずかしいのは、絵のセンスの問題ではありません。<br>
+        「1枚の絵を、決められた形式のパラパラ漫画に変換する」という、
+        本来パソコンにやらせるべき作業を、手でやろうとするから止まるんです。
+      </p>
+
+      <div class="worry-answer">
+        <span class="bg-ico">💻</span>
+        <p class="t">
+          そこをまるごと引き受けてくれるのが
+          <span class="big">Codex（コーデックス）</span>
+        </p>
+        <p class="d">
+          パソコンの中で実際に手を動かせるAI。<br>
+          コマ割りも、サイズ調整も、容量の圧縮も、<br>
+          <strong>そのまま申請できるファイル</strong>にして出してくれます。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 全体像 ============ -->
+  <section style="background:linear-gradient(180deg,#ffffff,#fdf4f0);">
+    <div class="sec-head">
+      <span class="pill-soft">まずは全体像から</span>
+      <h2 style="margin-top:12px;">たった4ステップで<br>販売申請までいけます🎉</h2>
+    </div>
+
+    <div class="flow-overview">
+      <div class="flow-row">
+        <span class="flow-dot">💻</span>
+        <span class="lbl">Codexを準備する<small>入れてサインインするだけ</small></span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-dot">📋</span>
+        <span class="lbl">プロンプトを貼る<small>下のボタンでコピーするだけ</small></span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-dot">💬</span>
+        <span class="lbl">デザイン案を選ぶ<small>3案から選ぶ、または「おまかせ」</small></span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-dot">🛒</span>
+        <span class="lbl">LINEに申請する<small>できたZIPをアップするだけ</small></span>
+      </div>
+    </div>
+
+    <div class="note-soft">
+      <p>
+        このプロンプトは、指定がなければ<strong>40個のフルセット</strong>で組み立てる仕様です。<br>
+        「ありがとう」「了解」「おつかれ」など、<br>
+        <strong class="c-red">日常で本当に使われる言葉から先に埋まります。</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ STEP 1 Codex導入 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="step-label">STEP 1</span>
+      <h2>💻 Codexを準備する</h2>
+      <p class="lead">
+        Codexは、OpenAIが出している「パソコンの中で作業してくれるAI」です。<br>
+        ChatGPTと違って<strong>ファイルを実際に作れる</strong>ので、<br>
+        動く絵文字のデータがそのまま手元に出てきます。
+      </p>
+    </div>
+
+    <div class="prep">
+      <p class="ttl">🧺&nbsp;先に用意するもの</p>
+      <ul>
+        <li>
+          <span class="ico">💳</span>
+          <span><b>ChatGPTの有料プラン</b>Plus以上に入っていれば、Codexは追加課金なしで使えるプランです。</span>
+        </li>
+        <li>
+          <span class="ico">💻</span>
+          <span><b>パソコン（MacまたはWindows）</b>スマホやタブレットでは動きません。ここだけはパソコンが必要です。</span>
+        </li>
+        <li>
+          <span class="ico">📱</span>
+          <span><b>LINEアカウント</b>販売申請に使います。ふだん使っているもので大丈夫です。</span>
+        </li>
+      </ul>
+    </div>
+
+    <a class="route-link" href="#phone-route">
+      📱 パソコンがない人はこちら
+      <span>スマホだけで、動かない絵文字40個を作る手順に飛びます</span>
+    </a>
+
+    <a class="ext-btn" href="https://chatgpt.com/download" target="_blank" rel="noopener">
+      <span class="tap">＼ タップして ／</span>
+      <span class="main">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        公式サイトからCodexを入手する
+      </span>
+    </a>
+    <p class="ext-note">OpenAI公式のダウンロードページが開きます。<br>CodexはChatGPTのデスクトップアプリの一部です。</p>
+
+    <ol class="mini-steps">
+      <li class="mini">
+        <h4>ダウンロードして、起動する</h4>
+        <p>上のボタンから、お使いのパソコン（Mac／Windows）に合わせてダウンロードします。出てきたファイルを開いて、案内どおりに進めるだけです。</p>
+        <p>起動すると最初にサインイン画面が出るので、<strong>いつも使っているChatGPTのアカウントでサインイン</strong>します。新しく登録する必要はありません。</p>
+      </li>
+
+      <li class="mini">
+        <h4>新しいタスクを開く</h4>
+        <p>サインインできたら、<strong>「New chat」</strong>を選んで新しいタスクを開きます。ここが、絵文字を作っていく作業場所です。</p>
+      </li>
+
+      <li class="mini">
+        <h4>使いたいキャラがいれば、画像を添付する</h4>
+        <p>すでに自分のキャラクターがある人は、<strong>その画像をプロンプトと一緒に添付</strong>してください。Codexがそれを基準の絵として固定し、40個ぶんの表情とポーズを同じ絵柄で作ります。</p>
+        <p>何もない場合は添付なしでかまいません。デザイン案のほうから一緒に決めていきます。</p>
+      </li>
+
+      <li class="mini">
+        <h4>途中で許可を聞かれたら「はい」</h4>
+        <p>画像を加工するための道具が足りないとき、Codexは「これを入れてもいいですか？」と聞いてきます。<strong>許可してあげれば、自分で用意して先へ進む流れです。</strong></p>
+        <p>ここは判断に迷いやすいところですが、作業に必要なものを入れているだけなので、そのまま進めて問題ありません。</p>
+      </li>
+    </ol>
+
+    <div class="callout-white">
+      <p style="text-align:center;">
+        準備はこれだけです☕<br>
+        <strong class="c-primary">あとはコピペと、質問に答えるだけ。</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ STEP 2 プロンプト ============ -->
+  <section style="background:#fdf4f0;border-top:1px solid var(--line);">
+    <div class="sec-head">
+      <span class="step-label">STEP 2</span>
+      <h2>📋 このプロンプトを貼る</h2>
+      <p class="lead">
+        Codexが起動したら、下のボタンでコピーして<br>
+        そのまま貼り付け、Enterを押すだけです。<br>
+        <strong>書き換える場所はひとつもありません。</strong><br>
+        使いたいキャラ画像がある人は、一緒に添付してください。
+      </p>
+    </div>
+
+    <div class="prompt-wrap">
+      <div class="bar">
+        <span class="cap">✨ コピペOK｜動くLINE絵文字 制作エージェント</span>
+        <button class="copy-big" data-copy-target="mainPrompt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          コピーする
+        </button>
+      </div>
+      <pre class="prompt-body" id="mainPrompt"># Codex実行用プロンプト：汎用・動くLINE絵文字40個制作
+
+完成版：2026-09-01（デザイン設計、32キャラクター＋8記号、20フレーム4秒、アンカーブレ検査、見切れ検査、提出ZIP検査を統合）
+
+## 単体テキストとして使う場合
+
+本ファイル末尾に標準40個テンプレートを内蔵しています。外部の`references/standard-40.md`は不要です。`scripts/check_apng_jitter.py`、`scripts/validate_apng_set.py`、`scripts/validate_submission_zip.py`が作業環境に存在しない場合は、本プロンプトに定義された検査条件と入出力に従う同等スクリプトを作成・動作確認してから使用してください。検査スクリプトがないことを理由に、ブレ・見切れ・透過・ZIP再検査を省略してはいけません。
+
+あなたは、LINE Creators Market向けのアニメーション絵文字を企画、制作、検査する制作エージェントです。このプロンプトを受け取ったら、デザイン確定後に原画、透過、サイズ統一、アニメーション、審査前検査、プレビュー、提出用ZIPまで完成させてください。
+
+本制作では、次の3要素を同格の必須品質として扱います。
+
+1. **デザイン性**：記憶に残るキャラクター、40個の構図差、シリーズ統一、主役要素の明確さ
+2. **アニメーション品質**：感情に固有の動作、固定アンカー、左右ブレ防止、滑らかな20フレーム
+3. **商品・審査適合性**：日常での使いやすさ、第1フレーム、視認性、LINE公式仕様と審査ガイドライン
+
+動きが滑らかでもデザインが単調なら不合格です。デザインが優れていても、キャラクター崩れ、左右ブレ、見切れ、意味の弱い第1フレームがあれば合格にはなりません。
+
+## 1. 最初の応答
+
+キャラクターや絵柄が未確定なら、画像生成を始める前に次を確認または提案します。
+
+- キャラクターまたはモチーフ
+- 想定する購入者と利用場面
+- 絵柄、輪郭線、配色、表情の強さ
+- 文字の有無
+- 参考画像の役割
+- 基準にする1枚のサイズ感
+- 一言で説明できる商品コンセプト
+- 造形または素材の特徴（例：透明感、クレイ、陶器、フェルト、ソフビ、ゼリー、焼き菓子など）
+- 商品一覧で他作品と見分けられる特徴
+
+指定が曖昧なら、設計思想と商品コンセプトが異なる3案の提示と、おすすめ1案の提案が必要です。単なる動物違い、色違い、線の太さ違いを3案として数えてはいけません。各案について、モチーフ、一言コンセプト、造形、素材感、配色、シルエット、視覚的フック、小サイズ視認性、40種類への展開性、想定ユーザー、他商品と同化しにくい理由を説明します。ユーザーが「おまかせ」「この案で」と答えた場合は、追加確認で止まらず制作へ進む流れです。
+
+キャラクター画像がある場合は勝手に変更せず、顔、体型、耳・髪・模様、線、色を固定してください。参考画像は、デザイン基準、サイズ基準、種類の参考など役割を区別します。第三者画像については、絵柄そのものの複製を避け、種類や構造だけを参考にする方針です。
+
+指定キャラクターの独自性が弱い場合も、勝手に別デザインへ変更してはいけません。元の魅力と同一性を残したまま、造形、素材感、配色、視覚的フック、専用エフェクトを強化する3案を提示し、ユーザーが承認した案だけを基準キャラクターへ反映します。
+
+## 2. 現行仕様と審査ガイドライン
+
+制作開始時に、LINE Creators Market公式ページを確認してください。
+
+- アニメーション絵文字制作ガイド：`https://creator.line.me/ja/guideline/animationemoji/`
+- 絵文字審査ガイドライン：`https://creator.line.me/ja/review_guideline/`
+
+確認日、公式URL、画像数、寸法、DPI、容量、フレーム数、再生時間、ループ数、ZIP内ファイル名を `reports/spec-snapshot.md` に保存します。公式仕様と本プロンプトが異なる場合、優先すべきは公式仕様です。
+
+企画・画像・テキスト・ZIPの各段階で、形式、視認性、文字、重複、モラル、広告、権利、AI利用申告を検査し、`reports/review-guideline-check.md` に記録します。既存キャラクター、ロゴ、ブランド、人物、作家固有の絵柄を無断使用しません。
+
+## 3. 標準40個テンプレート
+
+40個を作る場合は、次のファイルを唯一の標準構成として使用します。
+
+**本テキスト末尾に収録した「動くLINE絵文字・標準40個テンプレート」**
+
+構成は次の通りです。
+
+- 会話の基本：12個（キャラクター）
+- 明るい感情・反応：12個（キャラクター）
+- 困った感情：8個（キャラクター）
+- 使いやすい文字・記号・エフェクト：8個（キャラクターなし）
+
+標準配分は「キャラクター32個＋記号8個」。40個すべてへキャラクターを出すと一覧が重く単調に見えるため、33〜40は文章の後ろへ付けやすい `OK!`、ハート、汗、`!?`、疑問符、キラキラ、炎、`zzz` にします。添付された一般的な絵文字一覧は、種類と用途の広さを考える参考にだけ使い、画像の形、配色、配置、質感を複製しません。
+
+テンプレートの意味、1フレーム目、主動作、固有要素を `emoji-plan.json` に展開します。キャラクターの形に合わない手や動作は、意味と識別性を保ちながら、肉球、翼、葉、触手などへ置き換えてください。
+
+テンプレート内の「40個のアニメーション・バリエーション表」も必須仕様として展開します。意味と主動作が異なるだけでは合格にせず、`motion_family`、`spatial_path`、`tempo_class`、`beat_pattern`、`peak_hold`、`loop_return_type` の組み合わせは全40個で一意にすることが条件です。
+
+## 3-B. 必須5条件の同時合格ゲート
+
+各絵文字は、次の5条件をすべて同時に満たさなければ制作済みにしません。どれか1つでも欠けた場合は、APNG化せず原画またはキーフレームから作り直します。
+
+1. **第1フレームのサイズ統一**：01〜32はキャラクター本体の幅、高さ、顔幅、中心位置、足元、輪郭線の見かけを基準画像へ揃える。33〜40は記号の光学サイズ、線幅、素材感を揃えます。
+2. **第1フレームの感情伝達**：第1フレームだけを見て、文字ラベルなしでも感情または会話用途を推測できる。
+3. **感情に固有の実動作**：手、頭、上半身、足、尻尾、涙、小物、エフェクトなど、意味を担う部位が実際に位置・角度・形・量を変える。
+4. **シリーズ同一性**：01〜32は承認済み基準画像と同じ耳、顔、輪郭、体型、手足、尻尾、線、色を保つ。33〜40は同じ線色、アクセント色、素材感、光源、角の丸みを保つ。
+5. **デザイン差別化**：各項目に固有の主役要素があり、類似感情とは構図、表情、ポーズ、身体変形、エフェクト、感情強度の最低3軸が異なる。
+
+全体画像を上下左右へ移動、揺らす、回転・傾斜する、拡大縮小するだけのアニメーションは、3番の実動作として数えずすべてNGです。全身バウンドや小さな揺れは補助動作にとどめ、主動作の代用にしません。記号8個も、単純な点滅・拡大・傾斜ではなく、構成部品が別方向から飛来する、組み上がる、分離する、落下する、交差するなどの実動作を必須にします。
+
+制作前に各番号について、`emoji-plan.json` への追加が必要な項目は次の通りです。
+
+- `first_frame_emotion_cues`：目、眉、口、頬、手、姿勢、小物、エフェクト
+- `target_character_bbox`：基準となるキャラクター本体の幅、高さ、中心、足元
+- `moving_parts`：実際に動かす部位
+- `fixed_parts`：動作中も固定する部位
+- `anchor_points`：足元、腰、肩、首、手首、小物の支点座標
+- `horizontal_anchor`：左右位置を固定する代表ランドマーク
+- `anchor_roi`：ブレ検査で追跡する、動作中も外見が安定する小領域 `[x, y, width, height]`
+- `anchor_search_px`：アンカー探索を許可する範囲。通常は6〜12px
+- `character_identity_landmarks`：耳先、折れ耳、目、鼻、口、頬、足、尻尾の基準座標
+- `keyframe_storyboard`：完成、予備、最大動作、戻りの各状態
+- `primary_action_test`：どのフレーム差を見れば主動作を確認できるか
+- `motion_family`：全身、片腕、両手、頭、足、小物、エフェクト、画面移動など
+- `spatial_path`：縦、横、斜め、円弧、円、奥行き、画面外など
+- `tempo_class`：slow、medium、fast
+- `beat_pattern`：単発、大小2拍、3連打、4交互、連続、呼吸など
+- `peak_hold_ms`：最大動作を保持する時間
+- `loop_return_type`：通常復帰、反動、退出再登場、戻らず保持など
+- `major_part_displacement_px`：主要部品が20〜60px動く設計値
+- `safe_area_px`：全フレームで原則8px以上
+- `whole_sprite_only_motion`：必ず `false`
+
+`anchor_roi`には、動かす手、尻尾、涙、エフェクト、変形する顔などを含めません。立ち姿なら接地足または腰、座り姿なら尻または胴体下部、手の演技なら胴体中心など、動作中も形が安定する部分を指定します。ジャンプや横移動などアンカー自体が動く演技では、許可軌道とフレーム別の期待座標を事前に記録してください。
+
+## 4. 第1フレームを先に完成させる
+
+アニメーションを作る前に、キャラクター32個と記号8個を含む40個すべての第1フレームを完成させてください。第1フレームは、アニメーションが再生されない画面でも意味が分かる完成状態です。
+
+禁止事項：
+
+- 無表情の通常立ち
+- 動作前の待機姿勢や予備動作
+- 意味を決める表情、小物、エフェクトがまだ出ていない状態
+- キャラクターが小さすぎる、画面端から一部だけ見える状態
+- ファイル名や説明がなければ用途を判断できない状態
+- 記号が未完成で、動かなければ文字や意味を読めない状態
+
+第1フレーム40枚を、180×180pxと実表示相当24〜32pxの両方で一覧化します。静止画だけで用途を推測できない項目は、APNG化する前に構図から作り直してください。
+
+第1フレームの感情判定は、ファイル名、番号、説明文を隠した状態で行います。最低限の検査項目は次の通り。
+
+- 目と眉だけで感情の方向が分かるか
+- 口の形が目・眉と矛盾していないか
+- 手と体勢が会話用途を補強しているか
+- 涙、汗、怒り、疑問、炎、ハート、小物などの意味要素が完成状態で見えるか
+- 32px表示でも類似項目と取り違えないか
+
+意味が「動けば分かる」状態は不合格です。動く前から分かり、動くことで意味がさらに強くなる構成だけを採用します。
+
+## 5. キャラクターサイズを数値で統一する
+
+「キャンバスが同じ180×180px」だけでは合格にしません。01〜32はユーザーが承認した基準画像1枚から、キャラクター本体の見かけの大きさを測定し、`style-lock.json` に保存します。33〜40は各記号の外接矩形、線幅、中心、視覚重量を `symbol_style_lock` という設定として別に保存してください。
+
+最低限記録する値：
+
+- `target_character_width_px`
+- `target_character_height_px`
+- `target_center_x_px`
+- `target_baseline_y_px`
+- `target_face_width_px`
+- `target_outline_width_px`
+- 各値の許容差
+
+標準許容差は次の通りです。
+
+- キャラクター本体の幅・高さ：基準値の±5%
+- 中心位置：±4px
+- 立ち姿の足元：±3px
+- 顔幅：±5%
+- 輪郭線：見かけ上±10%
+
+小物、文字、汗、涙、炎、星、ハートなどのエフェクトを、キャラクター本体の外接矩形へ含めて測定してはいけません。猫本体など主役だけのマスクまたは目視基準で測ります。小物が大きい項目でも、主役を縮小して帳尻を合わせません。
+
+横向き、寝姿、走行姿勢では全身の縦横比が変わるため、顔幅と線幅を優先して同じキャラクターサイズに見せます。寝姿だけを無理に縦へ拡大しません。
+
+各第1フレームについて測定結果を `reports/scale-audit.csv` に保存します。許容差を外れた画像は自動補正または再生成のうえ、40枚一覧の再確認が必要です。
+
+サイズ補正は第1フレームを基準に1回だけ決定します。同じ絵文字の第2フレーム以降には、第1フレームで確定した同一の拡大率、基準中心、基準足元を適用してください。各キーフレームを個別に中央揃え・個別正規化してはいけません。個別正規化すると、お辞儀、ジャンプ、手振り、沈み込みなど本来の移動量が消えてしまうためです。
+
+動作によって頭、手、足、エフェクトが基準枠から自然に動くことは許可します。ただしキャラクターそのものが別サイズへ変化して見える生成崩れは不合格です。
+
+## 6. デザイン固定
+
+デザイン確定後、`design-brief.md` と `style-lock.json` を作成します。
+
+`style-lock.json` には次を記録してください。
+
+- project_name
+- target_audience
+- use_cases
+- character_or_motif
+- one_sentence_product_concept
+- silhouette
+- proportions
+- face_rules
+- eye_rules
+- mouth_rules
+- line_color
+- line_width_rule
+- base_colors
+- effect_colors
+- shading_rule
+- highlight_rule
+- shadow_rule
+- gloss_rule
+- depth_rule
+- layer_rule
+- material_concept
+- texture_rule
+- text_language
+- forbidden_changes
+- copyright_safety_notes
+- visual_hooks：シリーズの大半で維持する、最低3つの記憶点
+- deformable_parts：感情に合わせて自然に変形できる部位
+- signature_effect_style：シリーズ専用エフェクトの形、線、色、質感
+- 第5節のサイズ基準
+- symbol_style_lock：33〜40共通の線色、線幅、角の丸み、素材、ハイライト、影、光学中心、安全域
+
+耳、髪、模様、体型、配色、線、顔の配置が変化した画像は採用しません。
+
+承認済みの基準キャラクターを `character-master.png` として保存し、以後これを唯一の同一性基準にします。コードで似たキャラクターを描き直す、別のAI生成画像を基準へ差し替える、輪郭を簡略化して別デザインへ変えることは禁止事項です。
+
+最低限、次のランドマークを記録します。
+
+- 左右の耳先と折れ耳の向き
+- 両目、鼻、口、頬の中心座標と間隔
+- 顔幅と体幅の比率
+- 足の位置と形
+- 尻尾の位置、向き、模様
+- 輪郭線の色と太さ
+
+第1フレームは承認済み原画そのもの、または同一性検査に合格した派生原画を使用してください。サイズ調整と透過処理以外の理由で、顔や輪郭を再描画してはいけません。
+
+### 6-A. デザイン性と変化の設計
+
+キャラクターは、単にかわいいだけでなく、40種類へ展開しても同一性を保ちながら表情・姿勢・シルエットを変えられる設計にします。基準デザインには、耳、頭の形、頬、尻尾、模様、質感、専用エフェクトなどから、シリーズを記憶させる視覚的フックを最低3つ設定することが条件です。この3つは感情やポーズが変わっても大半の絵文字で認識できる状態を維持してください。
+
+固定するもの：
+
+- キャラクターの核となる頭身、顔の基本構造、配色、線、主要な特徴、世界観
+- 視覚的フック、顔パーツの基本配置、シリーズ専用エフェクトのデザイン言語
+
+変化させるもの：
+
+- 目と口、頭角度、体の向き、手足、構図、感情強度
+- 顔アップ、上半身、全身、座り、寝姿、斜め向きなどの見え方
+- ふくらむ、つぶれる、しぼむ、丸まる、反るなど、同一キャラクターの範囲内の身体変形
+- 涙、汗、ハート、キラキラ、怒り線などの主役エフェクト
+
+各絵文字には、涙、手、目、口、身体変形、小物、エフェクトなどから「主役要素」を1つ決めます。すべてを詰め込まず、実表示サイズで最初に目に入る要素を明確にしてください。似た意味の2個は、表情だけで区別せず、構図、表情、ポーズ、身体変形、エフェクト、感情強度のうち最低3軸を変えます。ただし変形によって視覚的フックが失われ、別キャラクターに見えるものは不合格です。
+
+### 6-B. 「凝ったデザイン」の定義
+
+凝ったデザインとは、細部や装飾を増やすことではありません。次の要素から、キャラクターのコンセプトに必要なものを選び、造形として一貫させます。
+
+- 独自のシルエット、頭、耳、尻尾、手足、目の形
+- 通常の動物配色から一歩進んだ、覚えやすく小サイズでも判別できる配色
+- 立体感、柔らかな陰影、ハイライト、光沢、奥行き、レイヤー感
+- クレイ、陶器、ミルクガラス、フェルト、刺繍、ぬいぐるみ、ソフビ、グミ、ゼリー、焼き菓子など、一言コンセプトと結び付いた素材感
+- 感情による大胆な身体変形とシルエット変化
+- キャラクターと融合した、シリーズ専用のハート、涙、汗、怒り、炎、キラキラ
+
+素材表現を無関係に混在させてはいけません。たとえば陶器コンセプトなら、ハイライト、影、エフェクト、記号にも陶器シリーズとしての共通言語を持たせます。
+
+次はデザイン性として数えません。
+
+- 毛を1本ずつ描く、小さな模様を増やす、極細線を追加する
+- 細かい服の柄、小さなアクセサリー、小物、背景を大量に置く
+- 縮小すると消えるテクスチャや装飾を増やす
+- 太線と単色塗りの普通の動物へ、表情だけを追加する
+- Unicode絵文字をキャラクターへ置き換えただけの構図
+
+小サイズで潰れる場合は細部を追加せず、顔、目、手、エフェクト、シルエットを大きくし、線を整理し、コントラストを高めて修正します。
+
+### 6-C. デザイン独自性・商品力ゲート
+
+基準キャラクターを固定する前の検査項目は次の通りです。
+
+1. デザインの特徴を、動物名や「かわいい」を使わず一文で説明できるか。
+2. 普通の白猫、柴犬、クマ、ウサギ、ヒヨコ、丸顔、点目と小口だけの量産型に見えないか。
+3. キャラクターのシルエットだけでも、同カテゴリの商品と区別できるか。
+4. 視覚的フックが装飾ではなく、頭、耳、体、目、素材、専用エフェクトなど主要造形へ組み込まれているか。
+5. 40個並べたときに統一感がありながら、もっと見たいと思える変化があるか。
+6. 商品一覧の小さなサムネイルでも、他商品と同化せず魅力が残るか。
+7. 独自性を高めても、日常会話で使いにくい奇抜さになっていないか。
+
+一般的すぎる場合は完成扱いにせず、元キャラクターの同一性を残した「造形強化」「素材強化」「専用エフェクト強化」の3方向を提案します。
+
+`reports/design-quality-audit.csv` を作り、次を各20点、合計100点で採点してください。
+
+- concept_strength：一言コンセプトの強さ
+- silhouette_originality：シルエットの独自性
+- material_and_depth：素材感、立体感、光、影の一貫性
+- series_hooks：視覚的フックと専用エフェクト
+- small_size_product_appeal：小サイズでの視認性と商品力
+
+合計80点未満、またはいずれか1項目が12点未満の場合はデザイン不合格です。採点理由を具体的に記録し、NGになった項目だけを修正してください。
+
+採点とは別に、次のデザイン実装ゲートをすべて満たしてください。
+
+- 32px表示で、目・口・主役要素・シルエットのうち最低2つを即座に認識できる
+- キャラクターの視覚的フック3つのうち最低2つが、01〜32の各第1フレームで確認できる
+- 濃い輪郭と塗りのコントラストが、白・黒・淡色の背景上で判別できる
+- 最大動作を想定しても上下左右8pxの安全域を確保できる構図である
+- 端へ寄せること自体が意味ではない絵文字を、見栄えだけのために端へ配置しない
+- 小さな装飾を増やさず、主役要素、ポーズ、素材感、光学サイズを優先している
+
+## 7. 重複防止ゲート
+
+原画生成前に `reports/uniqueness-matrix.csv` を作成し、全40個について次を記録します。
+
+- number
+- meaning
+- conversation_intent
+- first_frame_silhouette
+- face_expression
+- hand_or_body_position
+- primary_motion
+- dominant_effect
+- prop_or_symbol
+- dominant_visual_element
+- composition_type
+- body_deformation
+- emotion_intensity
+- distinguishing_feature
+- similar_candidate_numbers
+- uniqueness_result
+
+必須条件：
+
+- 同じ基本シルエットと主動作の組み合わせは1回だけ
+- `primary_motion + first_frame_silhouette + dominant_effect` は全件で一意
+- 類似候補には、構図、表情、目、口、手、体勢、身体変形、エフェクト、感情強度のうち最低3軸の明確な差がある
+- エフェクトだけを変えて別絵文字にしない
+- 同じポーズを縮小、反転、色変更しただけの画像を別項目として採用しない
+- 同じ速度曲線、同じ拍数、同じ方向の往復を、対象部位だけ変えて別動作として扱わない
+- 総再生時間は全件4,000msに統一するが、最大動作の位置、各フレームの表示時間、拍数、速度曲線は動作ごとに変える
+- 第1フレームを入れ替えても意味が成立する2個は重複候補として作り直す
+
+生成後は意味、見た目、動きを別々に検査し、`reports/collision-report.md` へ記録してください。未解決の重複候補が0になるまでAPNG化しません。
+
+### 7-A. 40個の構図・商品バランス
+
+40個を並べたときの単調さを防ぐため、01〜32のキャラクター構図と33〜40の記号を混在させて見え方を確認します。キャラクター側は正面立ち、閉じ目、胸前の手、同じ顔角度が連続しないよう調整してください。
+
+- 顔中心または顔アップ：10〜14個
+- 上半身中心：6〜10個
+- 全身と大きなポーズ：10〜14個
+- 座り、寝姿、後ろ向き、斜め向き：6〜10個
+- 身体変形またはエフェクトが主役：6〜10個
+- 小物を使う演技：4〜8個
+
+8個ごとのまとまりでも、同じ構図が3個以上連続せず、表情、手、シルエット、素材の見せ方が偏らないようにします。各8個を一覧表示し、「別商品と見分けられるか」「もっと見たい変化があるか」「かわいいだけで終わっていないか」「それでも日常で使いやすいか」を確認することが必須です。
+
+## 8. 原画生成
+
+40個を一括で本制作する前に、異なる動作ファミリーから4個を選び、20フレームの販売品質プロトタイプを完成させてください。標準候補は、低速全身動作、手前方向のポップ、大ジャンプ、横移動または部品組み立てです。4個でデザイン同一性、演技量、見切れ、アンカーブレ、300KB圧縮を確認し、失敗方式を修正してから残りへ展開します。
+
+- 組み込み画像生成を使用します。
+- 参考キャラクターを毎回参照します。
+- 原則2×2の4ポーズシート単位で生成します。
+- 各マスを均等にし、十分なガターを設け、何もマスをまたがせません。
+- 全マスでキャラクター本体を同じ見かけの大きさと基準位置にします。
+- 文字、ラベル、透かし、不要な影を入れません。
+- 均一なクロマキー背景または真正な透過背景を使用し、透過後に緑縁や白縁を検査します。
+- キャラクター項目01〜32は、各絵文字について**最低6枚の承認済み専用ポーズ原画**を必須とします。4枚への省略は禁止します。手足、顔、頭、胴体、小物を動作に合わせて描き分け、単一完成画像の伸縮・傾斜・ワープから作った疑似差分を専用ポーズとして数えてはいけません。
+- 必須6ポーズは、`P1 意味が完成している第1フレーム → P2 予備動作 → P3 動作途中・通過姿勢 → P4 意味が最も強い最大動作 → P5 反動・着地・受け止め → P6 元へ戻るための別ポーズ` とします。P6はP2またはP3の単純な逆再生にせず、減速、余韻、着地、持ち直しの形を描き分けます。
+- 6枚はファイル数だけでなくポーズそのものが異なる必要があります。連続する専用原画間で、`手足の接続位置`、`関節角度`、`頭と胴体の相対位置`、`足の接地状態`、`顔パーツ`、`小物との接触・隠れ`、`外形シルエット` のうち、動作に関係する最低3項目を変えます。全体の平行移動、回転、拡大縮小だけの画像は別ポーズとして数えません。
+- 記号項目33〜40も、完成記号の変形だけで済ませず、最低5つの構成状態を作ります。例：部品出現、接近、衝突または結合、完成、反動または分散。
+- 専用原画を `poses/NNN/P1-first.png` から `P6-return.png` へ保存し、`reports/pose-manifest.csv` に `number, pose_id, role, changed_joints, changed_contact, silhouette_change, generated_from_single_warp, identity_result, approval` を記録します。01〜32の `dedicated_pose_count` が6未満、または `generated_from_single_warp=true` が1件でもあればアニメーション工程へ進みません。
+- 第1フレームと最大動作フレームの間で、`moving_parts` に指定した部位の位置、角度、形、量が明確に変わらなければ再生成します。
+- 最終アニメーションは、承認済みの基準キャラクターと、同一性検査を通過した専用ポーズ原画から作ります。単一原画だけをメッシュ変形・自由変形して40個を作らないでください。最低限、`body`、`head`、`left_arm`、`right_arm`、`legs_or_feet`、`tail`、`face_parts`、`prop`、`effect` を必要に応じて分離します。
+- レイヤーは承認済み原画からマスクで抽出します。コードで近似的な猫・人物・モチーフを描き直してレイヤーを作ってはいけません。
+- 動かした部位の背後に隠れていた部分が必要な場合は、元原画の色、線、形を維持した補完用アンダーペイントを1回だけ作り、全フレームで同じものを再利用します。
+- `fixed_parts` は絵文字ごとに定義し、その動作で本当に動かない部位だけに限定します。固定対象にしたレイヤーは同一画像・同一座標を再利用します。お辞儀、ジャンプ、のけぞり、振り向き、寝転びなどでは、全身や胴体を一律の固定対象にせず、動作中も安定する接地点または局所ランドマークだけをアンカーにします。
+- `moving_parts` だけを `anchor_points` を中心に平行移動、回転、変形、差し替えます。支点はアニメーション中に勝手に移動させません。
+- 中間フレームは部位レイヤーの座標、角度、変形量を連続補間するか、専用の中割り原画を使います。別画像同士の単純なクロスフェードで中間フレームを作ってはいけません。
+- AI生成した複数キーフレームは、部位の到達位置や形を決める参考として使用できますが、固定輪郭が一致しない画像をそのまま最終APNGへ入れてはいけません。
+- 33〜40はキャラクター画像を描かず、`symbol_style_lock` を参照して別途生成します。8個を単なる色違いにせず、文字の組み立て、箱からの放出、噴出と落下、別方向からの衝突、部品の結合、星の交差、火種からの展開、文字の押し出しと浮遊へ分けます。
+
+各シートを表示して確認し、キャラクター崩れ、耳や模様の変化、サイズ差、切れ、不要物があるマスは再生成します。
+
+### 専用ポーズ承認ゲート
+
+アニメーション化の前に、各番号のP1〜P6を横一列へ並べたポーズストリップを180pxと32pxで作ることが前提です。次をすべて満たすまで中割りを作りません。
+
+- P1、P3、P4、P5のシルエットが32pxでも別ポーズに見える
+- P2で本動作と逆方向の予備動作または力を溜める変化がある
+- P3はP1とP4の透明度合成ではなく、手足・関節・接地が描かれた通過姿勢である
+- P4は手足、顔、体、小物が意味に合う最大状態になり、単なる全体移動や膨張ではない
+- P5はジャンプなら着地、押し出しなら腕の伸び切り後の反動、涙なら拭う動作など、作用の結果を示す
+- P6は逆再生コピーではなく、余韻を残しながら第1フレームへ接続できる
+- 顔、耳、体形、尻尾、線幅、素材感は6枚すべて同一キャラクターとして一致する
+- 全ポーズが安全域内に収まり、最大動作でも見切れない
+
+「いいね」は腕が引かれる→肩と肘が前へ出る→肉球が手前へ突き出る→腕が反動で戻る、「やったー」はしゃがむ→足が離れる→空中で手足が開く→膝を曲げて着地する、「応援」は拳を引く→肩から突き上げる→炎が遅れて立ち上がる→拳と炎が別々に反動する、まで別ポーズで表現します。
+
+## 9. アニメーション
+
+第1フレームを起点に、標準40個テンプレートの主動作を実装してください。
+
+- 1個につき20フレームを使用する
+- 1周の総再生時間を正確に4,000msとする
+- 4,000msで1周するためループ数は1回とする。LINE公式の「1〜4回、総再生時間4秒以内」を超えない
+- 20枚を均等200msにせず、移動途中は短く、感情の決めポーズは長くして、20フレーム分の表示時間合計を4,000msにする
+- 標準の時間設計は、予備動作10〜20%、本動作25〜40%、決めの静止10〜20%、反動と戻り30〜45%とする
+- 主動作の最大点では1〜2フレーム保持し、何が起きたか小サイズでも読める「間」を作る
+- 手足、頭、小物、記号の主要部品など意味を担う部位は、原則として最大点まで20〜60px移動させる。小さな表情部品でも12px以上の明確な変化を作る。32px表示で開始・途中・決めが別ポーズに見えなければ動きが小さいためFAILとする
+- 星を見せる動作なら、空の手を背中へ回す→星を取り出す→腕と上半身を大きく動かして頭上または手前へ掲げる、まで実演する。星を回転・点滅・拡大するだけでは不合格とする
+- 動作は大きくする一方、通常項目は全20フレームで上下左右8px以上の安全域を維持する。耳、手、足、尻尾、小物、エフェクトが1フレームでも見切れたらFAILとする
+- 180px表示だけでなく32px表示でも、開始・予備・最大動作の3状態を区別できること
+- 滑らかさはフレーム数だけでなく、ease-in、ease-out、anticipation、overshoot、settleで作る
+- 20フレームはP1〜P6の専用原画を通過点として補間する。目安はP1=1、P2=3〜5、P3=6〜9、P4=10〜13、P5=14〜17、P6=18〜19、P1への接続=20とし、動作ごとに最適化する
+- 戻り区間を往路のフレーム順を反転しただけにしない。接地、重力、慣性、小物の遅れ、表情の余韻を含む別軌道にする
+- 同一フレームの連続や、変化が小さすぎる水増しは禁止
+- 最終フレームから第1フレームへ自然に戻す
+- 小サイズで認識できない細かい動きは使わない
+- 動作の意味が最も強い完成状態を第1フレームに保つ
+
+フレーム20はループを閉じるためP1と同一でも構いません。この場合、格納フレーム数は20、固有フレーム数は19以上を合格条件とします。フレーム19と20を同一にするなど、連続する同一画像で枚数を水増ししてはいけません。全フレームが同一、または実質的な変化がないAPNGはアップロードエラー対象としてFAILにします。
+
+### 主動作の実装条件
+
+- お辞儀：足元と下半身を固定し、頭と上半身の角度・高さを変える
+- 手振り：胴体を基準に、片手の角度と先端位置を左右へ変える
+- 拍手：胴体を固定し、左右の手の間隔を開く・閉じる
+- 敬礼：胴体を固定し、片手を頬横から額へ移動する
+- うなずき：体の基準位置を保ち、頭の高さと角度を変える
+- ジャンプ：しゃがみ、離床、最高点、着地を作り、足元の接地状態を変える
+- 泣く：涙の位置・長さ・量と、涙を拭う手の位置を変える
+- 怒る：拳、眉、怒り記号の形・位置を変え、震えは補助動作にする
+- ハート：キャラクターの手はハートを抱き、ハート本体の大きさを鼓動させる
+- 走る：左右の足と手を交互に動かし、横方向の移動と動き線を付ける
+- 仕事：手をキーボード上で交互に動かし、画面の光を変える
+- 体調不良：頭・上半身をふらつかせ、体温計や汗を追従させる
+- すごい：片腕を背中へ回し、隠れた星をつかみ、腕・肩・上半身を別ポーズへ変えて星を大きく掲げる
+- OK!：O・K・!が別方向から弧を描いて集まり、衝突して完成する
+- ハート：小箱または包みが開き、3つのハートが別々の軌道で飛び出す
+- 汗：3粒が異なる始点から噴き出し、それぞれ別の放物線で落下する
+- !?：!が上から落下し、?が横から飛来して中央で衝突する
+- ？：曲線本体と点を別々に動かして組み立て、点だけを大きく跳ねさせる
+- キラキラ：3つの星が別方向から飛来して中央を交差し、別方向へ広がる
+- 炎：火種が跳ね、左右の炎が開き、中央炎が立ち上がる3段階にする
+- zzz：各文字が前の文字を押し出しながら現れ、3本の別軌道で斜め上へ進む
+
+この一覧にない動作も、`moving_parts` と `fixed_parts` を明示してから実装します。
+
+### 禁止する偽アニメーション
+
+- 完成画像全体を上下へ動かすだけ
+- 完成画像全体を左右へ揺らすだけ
+- 完成画像全体を回転するだけ
+- 完成画像全体を拡大縮小するだけ
+- 完成画像全体を傾けるだけ
+- 小さな振動、呼吸、点滅だけで4秒を埋める
+- 記号全体を揺らす、拡大縮小する、傾けるだけ
+- 小物やエフェクトだけを出現させ、キャラクターの手足・頭・姿勢が第1フレームと同じ
+- 同じ画像へエフェクトだけを点滅させ、キャラクターの主動作がない
+- 同一画像を表示時間だけ変えてフレーム数を増やす
+- 各キーフレームを個別中央揃えして、部位の移動を打ち消す
+- AIが別々に描いた完成画像を順番に並べ、輪郭や顔がフレームごとに変化する
+- 別画像同士をクロスフェードし、手や輪郭が二重に見える中間フレームを作る
+- 固定するはずの耳、目、輪郭、足元、模様が1px以上不規則に動く
+- 元キャラクターをコードの円、楕円、多角形などで近似的に描き直す
+- 動きやすさを優先して、耳、顔、足、尻尾、体型を別デザインへ変更する
+- 単一の完成画像へ局所ワープ、メッシュ変形、膨張、収縮を加えただけで主動作を完成させる
+- P1を拡大縮小・回転・傾斜・ワープした画像をP2〜P6として登録し、専用ポーズ数を満たしたことにする
+- 手足の接続位置、足の接地、顔、小物との接触が変わらないまま、外周だけをゼリー状に歪ませる
+- 手足が描かれた位置を変えず、周辺の輪郭だけを歪ませて「動いたこと」にする
+- 全20フレームを均等速度で往復させ、予備動作、決め、間、反動がない
+- 40個すべてを「予備動作→最大動作→逆再生で元へ戻る」という同一構造にする
+- 全40個を同じ約1秒周期で同時に膨張・収縮させる
+
+全体のバウンド、反動、揺れ、拡大縮小は、専用の部位動作が成立した後に補助として加える場合だけ許可対象です。
+
+### 販売品質の演技ゲート
+
+最大動作フレームを第1フレームと横に並べ、次をすべて満たすまで書き出しません。
+
+- 表情だけでなく、少なくとも1つの手足・頭・体勢・小物が別ポーズになっている
+- 2枚のシルエット差を32px表示でも認識できる
+- 動作名を隠しても、お辞儀、手振り、拍手、ジャンプ、泣く、走るなどの行為を推測できる
+- 単なる上下移動、揺れ、膨張、輪郭のゴム変形に見えない
+- 主要部品の移動が原則20px以上あり、32px表示でも途中ポーズと決めポーズが別状態に見える
+- 180pxの全フレームで通常項目の上下左右に8px以上の安全域があり、見切れがない
+- 決めポーズの前後に速度差と短い静止があり、機械的な往復に見えない
+- 第1フレームへ戻る際に、顔・耳・線が別キャラクターへ切り替わったように見えない
+- 6種類以上の専用ポーズがあり、単一原画の変形だけで作られたポーズが0枚である
+- 往路と復路が完全対称ではなく、予備動作、作用の結果、反動または着地が読み取れる
+
+### ブレ防止と固定アンカー
+
+- 立ち姿では足元または腰を固定アンカーにする。
+- 座り姿では接地面と尻を固定アンカーにする。
+- 手の動作では肩または肘を支点にし、胴体レイヤーを動かさない。
+- 首振り・うなずきでは首を支点にし、下半身と足元を動かさない。
+- お辞儀では足元と下半身を固定し、上半身グループを腰または股関節の1点から回転させる。
+- ジャンプや走行など全身移動が必要な動作でも、キャラクター内部の目・耳・模様・線幅は同じリグを維持する。
+- お辞儀、手振り、拍手、いいねなど横移動が意味ではない動作は、両足中央、腰、胴体中心、顔中心のいずれかを `horizontal_anchor` として固定し、左右へ揺らさない。
+- ジャンプは `horizontal_anchor` を固定し、縦方向だけを動かす。上端の耳・手・エフェクトが安全枠8pxへ侵入しない。
+- 走る、退出、再登場など横移動が意味となる項目だけ `allow_horizontal_travel: true` とし、移動経路を事前に数値指定する。
+- スプライトシートの列・行が切り替わる位置で座標がリセットされないよう、セル番号ではなく共通ステージ座標へ各ポーズを配置する。
+- 可動する手、尻尾、エフェクトを含む外接矩形で毎フレーム中央揃えしない。固定部位のランドマークから横位置を補正する。
+- 動作曲線には ease-in / ease-out を使い、フレーム間の座標変化を連続させる。整数座標へ早い段階で丸めず、高解像度または小数座標で補間して最後に180pxへ縮小する。
+- 180pxの4倍以上で描画し、最終段階で高品質縮小する。これにより回転する手や輪郭のギザつきを抑える。
+
+`fixed_parts` のフレーム差分を測定し、指定した固定マスク内の画素差が実質0であることを確認します。画像全体の重心や外接矩形中心を、左右ブレの判定に使用してはいけません。手、涙、尻尾、エフェクトが正しく動くだけでも全体重心は変化するためです。固定部分の位置ずれは0pxを目標とし、アンチエイリアス差を除く平均変位が0.5pxを超えた場合はFAILです。`allow_horizontal_travel` が false の項目では、`anchor_roi`から追跡した固定アンカーの左右位置範囲を全20フレームで1px以内に保ってください。アンカー追跡の信頼度が不足する場合は自動PASSにせずREVIEWとし、180pxと32pxで目視します。
+
+### キャラクター同一性検査
+
+完成後、`character-master.png` と各絵文字の第1フレームおよび主要フレームを比較し、`reports/identity-audit.csv` に記録します。
+
+- 耳の数、左右、折れ方が一致する
+- 目・鼻・口・頬の配置比率が許容差内
+- 顔幅、体幅、足位置、尻尾位置が許容差内
+- 輪郭色と線幅が一致する
+- 固定領域の画素は元原画と同一、またはサイズ変換による差だけ
+- 可動領域も元原画から抽出した部品、または承認済み差分だけで構成する
+
+キャラクターの見た目を目視で「別の猫・別の人物」と感じる場合は、動きが滑らかでもFAILです。動作のためにキャラクター同一性を犠牲にしてはいけません。
+
+完成後、全フレームの一意性、隣接フレーム差、ループ境界、ちらつき、輪郭崩れを検査します。
+
+### カクつき検査ゲート
+
+APNG完成後、`scripts/check_apng_jitter.py` を001.png〜040.pngへ実行し、`reports/jitter/jitter-audit.csv` と番号別の遷移CSVを作成してください。`tab.png`はこの検査へ含めません。アンカー設定は`reports/anchor-config.json`へ保存し、検査時に`--config`で渡します。フレーム数が仕様内でも、次のどれかに該当するものは滑らかとは判定しません。
+
+- 固定アンカーの重心または座標が、意図した動作と無関係に前後フレームへ飛ぶ
+- `allow_horizontal_travel` が false なのに、固定アンカーが左右へ1pxを超えて動く
+- スプライトシートの列・行境界で見かけの中心が周期的に飛ぶ
+- 胴体、耳、顔など固定領域の輪郭が不規則に増減する
+- 隣接フレームの移動量または輪郭変化量が、その動作内の中央値から突出する
+- 最大動作の前後だけポーズ間隔が広く、途中フレームを飛ばしたように見える
+- 最終フレームから第1フレームへ戻るループ境界に段差がある
+- ジャンプなど上方向へ動く項目が、指定した上端安全枠へ侵入する
+
+実行例：
+
+```bash
+python3 scripts/check_apng_jitter.py OUTPUT/final --config reports/anchor-config.json --output-dir reports/jitter
+```
+
+画面外へ退出すること自体が意味となる項目は `allow_stage_exit` として事前登録し、通常の見切れ判定から除外します。ただし、退出前後にキャラクターの輪郭が崩れることは許可しません。自動検査が `REVIEW` または `FAIL` の項目は、遷移CSVに示されたフレームペアを実寸180pxと実表示相当32pxの両方で目視確認します。AIが全身を毎フレーム描き直したことによる輪郭の脈動は、中間フレームを増やして解決せず、固定パーツを同一画像へ戻して修正してください。
+
+さらに `reports/motion-audit.csv` を作り、各番号について次を記録することが必須です。
+
+- meaning
+- moving_parts
+- fixed_parts
+- first_frame_description
+- peak_frame_description
+- observed_part_displacement
+- whole_sprite_only_motion：必ず `false`
+- fixed_anchor_displacement_px
+- fixed_region_difference_ratio
+- outline_jitter_result
+- horizontal_anchor
+- horizontal_anchor_range_px
+- max_adjacent_horizontal_anchor_step_px
+- allow_horizontal_travel
+- emotion_specific_motion_result：`PASS` または `FAIL`
+
+第1フレームと最大動作フレームを重ねた比較画像も作り、指定部位に明確な差があり、固定部位が不必要にずれていないことを目視確認します。
+
+### 300KB内で動きを最大化する容量設計
+
+300KBは、原画・レイヤー・動作設計の最初から守るべきハード制約です。実装では1ファイル **300,000bytes以下** を合格条件とし、再保存や環境差の余裕を含めて **285,000bytes以下** を制作目標にします。285,001〜300,000bytesは提出可能でも `REVIEW` 扱い、300,001bytes以上は `FAIL` です。
+
+- 容量を減らすために、主動作の20〜60pxの振幅、20フレーム、4,000msを先に削ってはいけない。動きの大きさではなく、毎フレーム変化する画素面積と色の複雑さを減らす
+- 各絵文字で`fixed_parts`に指定した部位だけは、全20フレームで位置とRGBA値を可能な限り一致させる。胴体、顔、接地足を全項目で一律に固定せず、演技上動く部位は`moving_parts`へ移す。固定部位を毎フレームAIで描き直さない
+- 腕、脚、頭、小物、涙、星など `moving_parts` は別レイヤーにし、小さい可動領域を20〜60pxの大きな軌道で動かす。全身画像を大きく平行移動するより、意味を担う部位を大きく動かす
+- APNGはフルフレーム20枚の単純格納ではなく、前フレームとの差分矩形を最小化して符号化する。blend/disposeを確認し、透明領域を含む不要な更新矩形を持たせない
+- 透明画素のRGBは0へ正規化し、PNGメタデータを除去し、可逆PNG/APNG最適化を行う
+- 太い一定の輪郭、ベタ塗り、少数の共通色、固定された1段影とハイライトを使う。フレームごとに変わる粒状テクスチャ、ノイズ、ディザ、広い半透明グロー、ぼかし影、複雑なグラデーションは禁止する
+- RGB/RGBA要件を維持したまま、必要時だけ色精度と階調を整理する。輪郭、顔、第1フレーム、商品固有色を優先し、主動作の形や振幅を劣化させない
+- 粒子を減らす場合は、意味を担わない小粒子から減らす。星を取り出す、涙を拭う、文字が衝突するなどの主動作は残す
+- ジャンプや全身回転など全身差分が必要な項目は、背景を固定し、内部の色・線・陰影を全ポーズで統一し、広い半透明効果を避ける。容量超過を理由に全身を小さくしたり動作を弱めたりしない
+- 同一フレームの水増しは禁止する。20枚すべてに意味のある連続変化を持たせたまま圧縮する
+
+容量超過時は次の順で修正し、途中で主動作を小さくしません。
+
+1. 透明画素のRGB正規化、メタデータ削除、可逆最適化
+2. 差分矩形、blend、disposeの最適化
+3. 固定領域をバイト単位で同一化し、影・ハイライトの不要なフレーム変化を除去
+4. 形を変えずに色階調・半透明階調を整理
+5. 意味を担わない粒子、ぼかし、細線、装飾を削減
+6. 主動作の振幅を保ったまま、可動レイヤーと更新矩形を再設計
+7. それでも300,000bytesを超える場合は完成扱いにせず、圧縮しやすい原画構造から再生成
+
+各絵文字へ `target_bytes: 285000`、`hard_limit_bytes: 300000`、`fixed_region_byte_identity: true`、`full_frame_redraw: false` を設定します。`reports/compression-audit.csv` に `number, bytes_before, bytes_after, target_met, hard_limit_met, frames, unique_frames, cycle_ms, max_changed_bbox_ratio, fixed_region_byte_identity, optimization_pass, visual_quality_result` を記録し、圧縮後も180pxと32pxでの輪郭ちらつき、色ムラ、感情の読みやすさ、動作振幅の再確認が必要です。
+
+## 10. LINE用書き出し
+
+公式の現行仕様へ従い、APNG40個と静止PNGの`tab.png`を作成してください。ファイル名は3桁の`001.png`から`040.png`まで欠番なしとし、ZIP直下へ配置します。提出ZIP直下は`001.png`〜`040.png`と`tab.png`の計41ファイルだけです。`main.png`、macOSの隠しファイル、フォルダ階層、フレーム素材、プレビュー、レポートを提出ZIPへ入れません。
+
+本プロンプトの標準書き出しは、180×180px、RGBA透過APNG、20フレーム、総再生時間4,000ms、ループ1回、1ファイル300,000bytes以下です。制作目標は285,000bytes以下とします。4,000msのアニメーションを2回以上ループさせると、LINE公式の総再生時間4秒以内を超えるため使用しません。
+
+提出前の最低限の検査項目は次の通りです。
+
+- 寸法、RGBA、透過、DPI
+- フレーム数20、一意フレーム数、総再生時間4,000ms、ループ数1
+- 1個あたりの容量、285,000bytes目標、300,000bytesハード上限、ZIP全体の容量
+- 差分矩形、固定領域のバイト一致、透明画素RGB、メタデータ除去、圧縮後の視覚品質
+- 第1フレームの意味
+- キャラクター本体のサイズ統一
+- 40個間の意味、見た目、動きの重複
+- ZIPのファイル数、名前、直下配置、破損
+
+`tab.png`は96×74px、背景透過、72dpi以上の静止PNGとし、APNGにしません。ZIP全体を20MB以下にします。
+
+APNG検査と提出ZIP検査を分離し、次の順で実行してください。
+
+```bash
+python3 scripts/validate_apng_set.py OUTPUT/final --expected-count 40 --strict-standard
+python3 scripts/validate_submission_zip.py LINE_READY.zip --expected-count 40 --strict-standard
+```
+
+作成後のZIPを開き直し、直下41ファイル、欠番、寸法、APNG構造、フレーム数、総時間、ループ数、透過、容量、静止`tab.png`、不要ファイルの不在を再検査します。1項目でも不合格ならZIPを完成扱いにしません。
+
+## 10-A. 中断・再開と再生成防止
+
+制作状態を`reports/progress.json`へ保存してください。各番号について`planned`、`first_frame_approved`、`poses_approved`、`animated`、`validated`、`packaged`を記録します。完了済み番号は、検査FAILまたはユーザーの明示的な修正指示がない限り再生成しません。再開時は実ファイルとハッシュを照合し、未完了の最初の工程から続行します。
+
+## 11. 販売情報
+
+日本語と英語で次を作成し、`store-listing-text.md` に保存します。
+
+- タイトル
+- 説明文
+- Creator's name
+- Copyright
+- AI使用申告
+- メイン画像候補4個
+
+テキストへURL、告知文言、機種依存文字、誤記、画像と矛盾する説明を入れません。
+
+## 12. 最終成果物
+
+最低限、次を出力します。
+
+- `LINE_READY.zip`
+- `previews/first-frames-180.png`
+- `previews/first-frames-32.png`
+- `previews/animated-contact-sheet.gif`
+- `design-brief.md`
+- `style-lock.json`
+- `emoji-plan.json`
+- `store-listing-text.md`
+- `reports/spec-snapshot.md`
+- `reports/scale-audit.csv`
+- `reports/design-quality-audit.csv`
+- `reports/motion-audit.csv`
+- `reports/anchor-config.json`
+- `reports/jitter/jitter-audit.csv`
+- `reports/identity-audit.csv`
+- `reports/uniqueness-matrix.csv`
+- `reports/collision-report.md`
+- `reports/review-guideline-check.md`
+- `reports/submission-zip-audit.json`
+- `reports/progress.json`
+- `reports/manifest.json`
+
+最終報告では、提出ZIP、静止プレビュー、登録文、検査レポートへのリンクを提示してください。審査通過は保証せず、制作上の検査結果と外部確認項目を明確に分けます。
+
+---
+
+# 単体実行版・内蔵テンプレート
+
+以下は上記プロンプトから参照する標準40個テンプレートです。この単体テキストを使用するときは、外部ファイルを探さず、以下を唯一の標準構成として使用してください。
+
+# 動くLINE絵文字・標準40個テンプレート
+
+## 目的
+
+日常会話で使いやすく、一覧表示でも飽きにくい40個を、キャラクターを差し替えて繰り返し制作するための標準テンプレート。キャラクター32個と、文章の後ろへ付けやすい記号8個で構成する。
+
+「似た意味を表情だけ少し変えて増やす」のではなく、会話用途、1フレーム目のシルエット、主動作を分ける。似た感情同士は、構図、表情、ポーズ、身体変形、エフェクト、感情強度のうち最低3軸を変える。
+
+## 共通制作ルール
+
+- 01〜32は同じ基準キャラクターを表示し、33〜40はキャラクターなしの記号・文字・エフェクトにする。
+- 1フレーム目だけで意味が伝わる完成ポーズにする。
+- 全項目を20フレーム、総再生時間4,000ms、ループ1回で制作する。各フレームの表示時間と決めポーズの位置は動作ごとに変える。
+- 01〜32は各項目につき最低6枚の専用ポーズ原画を作る。P1意味の完成、P2予備動作、P3通過姿勢、P4最大動作、P5反動・着地、P6戻りの別ポーズとし、単一原画の伸縮・傾斜・ワープを別ポーズとして数えない。
+- P1、P3、P4、P5は32px表示でもシルエットが別状態に見え、手足の接続、関節角度、接地、顔、小物との接触のうち動作に関係する最低3項目が変わること。
+- 33〜40も完成記号の変形だけにせず、部品出現、接近、衝突・結合、完成、反動・分散の最低5状態を作る。
+- 主動作は32px表示でも開始・途中・決めを別状態として判別できる大きさにする。手足・頭・小物は原則20〜60px動かし、姿勢とシルエットを大胆に変える。
+- 画面全体の揺れ、全体の拡大縮小、全体の傾きだけで完成させることは禁止する。必ず手足、頭、胴体、小物、記号の構成要素が別位置・別角度・別形状へ変わる実動作を入れる。
+- 全20フレームで上下左右8px以上の安全域を目標にし、大きな動きでも耳、手、足、小物、エフェクトを見切れさせない。
+- 1ファイル300,000bytes以下をハード上限、285,000bytes以下を制作目標にする。容量のために20フレーム、4,000ms、主動作20〜60pxを先に削らない。
+- 固定部位は絵文字ごとに定義し、その動作で本当に動かない部位だけ全20フレームでRGBAを一致させる。可動部位を小さな別レイヤーとして大きく動かし、APNGは最小差分矩形で符号化する。胴体や顔が演技上動く項目まで一律に固定しない。
+- ベタ塗り、太い一定線、少数の共通色、固定された1段影を使う。粒状ノイズ、ディザ、動くグラデーション、広い半透明グロー、ぼかし影は禁止する。
+- 容量超過時は、透明画素RGB正規化、メタデータ削除、可逆最適化、差分矩形最適化、固定画素の同一化、色階調整理、不要粒子削減の順で直す。主動作の振幅を小さくする修正は最後まで行わない。
+- 同じ基本シルエットと主動作の組み合わせは1回だけ。
+- 各項目に、最初に目へ入る主役要素を1つ設定する。
+- キャラクター固有の視覚的フックを最低3つ決め、01〜32の全身・顔アップ・変形ポーズでも同一キャラクターと認識できる状態を維持する。
+- 33〜40にも、キャラクターと同じ線色、アクセント色、素材感、角の丸み、光と影を適用し、別商品の素材に見せない。
+- 動物名や「かわいい」を使わず説明できる、一文の商品コンセプトを設定する。
+- 造形、素材感、ハイライト、影、光沢、奥行き、シリーズ専用エフェクトを同じアートディレクションで統一する。
+- 細部を増やすことで凝った見た目にせず、シルエット、素材、立体感、身体変形、演出で商品力を高める。
+- 同じ手の位置を使う場合は、体勢・表情・小物のすべてを変える。
+- キャラクター本体の見かけの大きさ、中心、足元、線の太さを01〜32で統一する。33〜40は記号ごとの光学サイズを揃える。
+- 横移動が意味ではない項目は、足元、腰、胴体、顔のいずれかを横方向の固定アンカーにし、全20フレームの左右差を1px以内にする。
+- 左右ブレは画像全体の重心ではなく、動作中も外見が安定する接地足、腰、尻、胴体中心などの`anchor_roi`を追跡して判定する。動く手、尻尾、涙、小物、エフェクトをアンカーへ含めない。
+- エフェクトや小物を理由にキャラクター本体を小さくしない。
+- 記号だけにするのは33〜40の8個に限定し、01〜32では必ずキャラクターを表示する。
+- 1フレーム目を40個並べ、意味・見た目・動きの重複を生成前後に検査する。
+- 全フレームで通常は上下左右8px以上の透明安全域を確保する。退出が意味となる項目だけ事前登録して例外とし、意図しない見切れを1フレームも許可しない。
+- フレーム20はループを閉じるため第1フレームと同一でもよいが、フレーム19と20を同一にしない。格納20フレーム、固有19フレーム以上を維持する。
+
+## A. 会話の基本 12個
+
+| No. | 用途 | 1フレーム目 | 主動作 | 重複を避ける固有要素 |
+|---:|---|---|---|---|
+| 01 | ありがとう | 穏やかな笑顔で両手を胸元へ寄せ、感謝が伝わる姿勢 | 腰を支点に丁寧にお辞儀する | 儀礼的で深すぎない感謝のお辞儀 |
+| 02 | お願い | 上目づかいで顔の前に両手を合わせる | 合掌したまま前後へ揺れる | 依頼専用の上目づかい |
+| 03 | ごめん | 正座して頭を深く下げた完成ポーズ | 深く下げて戻る | 最も低いお辞儀 |
+| 04 | 了解 | きりっとした目で片手を額へ | 敬礼して軽くバウンド | 唯一の敬礼 |
+| 05 | はい | 片手を真上へ上げ、正面を見る | 手を上げて大きくうなずく | 縦長の挙手 |
+| 06 | いいね | 笑顔で大きな肉球を手前へ出す | 肉球を押し出して戻す | 手前へ拡大する肉球 |
+| 07 | ダメ | 固い閉じ目で両腕を大きなXにする | Xのまま首を左右へ振る | 中央の大きなX |
+| 08 | 待って | 真剣な目で両肉球を正面へ出す | 両手を勢いよく押し出す | 開いた両手の制止 |
+| 09 | おつかれ | 座って温かいマグを両手で抱く | 湯気とゆっくりした呼吸 | マグと脱力した座り姿 |
+| 10 | おはよう | 眠気の残る笑顔で全身を縦へ伸ばす | 伸びながら目を開く | 最も縦長のシルエット |
+| 11 | おやすみ | 枕を抱いて横向きに目を閉じる | 両腕で枕を引き寄せ、頭と頬を大きく沈め、尻尾を体へ巻き付ける | 枕、横向き、抱き込みと沈み込み |
+| 12 | またね | 片目をウインクし片手を高く上げる | 片手を大きく左右へ振る | 唯一の手振り |
+
+## B. 明るい感情・反応 12個
+
+| No. | 用途 | 1フレーム目 | 主動作 | 重複を避ける固有要素 |
+|---:|---|---|---|---|
+| 13 | にっこり | 三日月目、小さな閉じ口、両手を頬横へ開く | 胸前で交差した両手を大きく外へ開き、頬と笑顔も開く | 静かな感情でも手の軌道を大きく見せる |
+| 14 | 爆笑 | 強い閉じ目と大口で腹を抱える | のけぞって前後へ揺れる | 腹を抱える横広ポーズ |
+| 15 | うれしい | 開いた笑顔で胸前に小さな両拳 | 小ジャンプと大ジャンプで腕・足・胴体を別ポーズへ変える | 高さの違う2回の跳躍 |
+| 16 | やったー | 輝く目で両手を真上へ上げる | 大きくジャンプして着地 | 両手バンザイと空中姿勢 |
+| 17 | 大好き | 幸せな閉じ目で大きなハートを抱く | 両腕を大きく開く→上から落ちるハートを受け止める→強く抱きしめる | 体前面の大きなハートと抱擁動作 |
+| 18 | 照れる | 伏し目で両手を頬へ、頬を濃く赤くする | 両手で顔を隠す→片手を大きく開いて片目で覗く→再び隠す | 顔を隠す・覗くの別ポーズ |
+| 19 | ほっとする | 閉じ目で座り、肩と両手を下げる | 胸前の両手を左右へ大きく開いて床へ下ろし、肩と頭を深く沈めて白い息を吐く | 手の開放と脱力した座り姿 |
+| 20 | わくわく | 大きな丸目で胸前に両拳を構える | 左拳・右拳・両拳を前へ交互に突き出し、両足も踏み替える | 前傾と手足の4拍交互動作 |
+| 21 | 感動 | 潤んだ大きな目で両手を胸に重ねる | 手を目元へ大きく運んで涙を受け、胸へ戻して両手を重ねる | 笑顔、一粒の涙、手の往復軌道 |
+| 22 | すごい | 星形の目で片手に大きな星を掲げる | 空の手を背中へ回す→星を取り出す→腕と上半身を大きく動かして掲げる | 背後から現れる大きな星 |
+| 23 | 拍手 | 笑顔で胸の前に開いた両手を置く | 両手を開閉して拍手 | 左右対称の手の開閉 |
+| 24 | 応援 | 強い笑顔で片拳を高く上げる | 拳と背後の炎が大きくなる | 片拳と炎 |
+
+## C. 困った感情 8個
+
+| No. | 用途 | 1フレーム目 | 主動作 | 重複を避ける固有要素 |
+|---:|---|---|---|---|
+| 25 | 悲しい | 下がり眉で背中を丸め、視線を下へ | 両手を胸前から力なく下へ落とし、頭・肩・胴体を20px以上沈める | 涙を使わない大きな沈み込み |
+| 26 | 泣く | 片目から一粒の涙、片手を目元へ | 涙を拭って戻る | 涙は1粒だけ |
+| 27 | 怒る | つり目で歯を食いしばり両拳を下へ | 全身が震え怒り記号が点滅 | 正面の両拳と赤い怒り記号 |
+| 28 | イライラ | 細い横目で腕組みし片足を前へ | 片足を繰り返し鳴らす | 腕組みと足踏み |
+| 29 | すねる | 背中を向け、横目で振り返り頬を膨らます | 正面から大きく背を向け、最後に頭だけ肩越しへ振り返り尻尾を払う | 唯一の後ろ向きと振り返り |
+| 30 | 困る | 八の字眉で片手を頭へ、反対の手を下げる | 頭をかき左右を見る | 非対称の頭かき |
+| 31 | 不安 | 揺れる瞳で両手を固く組む | 両手を離れた位置から胸元へ強く引き寄せ、膝を曲げ、汗が別方向へ落ちる | 手の大移動、縮こまる姿勢、歯を見せた緊張顔 |
+| 32 | 焦る | 小さい瞳で前傾し両手を上げる | 左手、右手、両手の順に慌てて動かし汗を飛ばす | 前傾、手足の交互性、多数の汗 |
+
+## D. 使いやすい記号・エフェクト 8個
+
+添付された一般的な絵文字一覧などは、用途の広さを考える参考にだけ使う。既存画像の形、配色、質感、配置を複製せず、商品のアートディレクションで独自に描き起こす。
+
+| No. | 用途 | 1フレーム目 | 主動作 | 重複を避ける固有要素 |
+|---:|---|---|---|---|
+| 33 | OK! | 大きく読みやすいOK!が完成状態で中央にある | O・K・!が別方向から飛来して中央で組み上がる | 唯一の英字、商品固有の太い丸文字 |
+| 34 | ハート | 大小3つのハートが斜めに並ぶ完成状態 | 小箱が開き、3つのハートが別々の弧で飛び出す | 箱の開閉、3個の時間差と上昇軌道 |
+| 35 | 汗 | 大中小3粒の汗が外向きに並ぶ | 3粒が異なる始点から噴き出し、別々の放物線で落下する | 水色の3粒と異なる軌道 |
+| 36 | !? | 太い感嘆符と疑問符が重なる完成状態 | !が上から落下し、?が横から飛来して中央で衝突する | 朱赤の!とミントの?の2方向動作 |
+| 37 | ？ | 大きな疑問符が傾いた完成状態 | 曲線本体が下から描かれ、点が上から落ちて結合し、点だけ跳ねる | 曲線と点の組み立て |
+| 38 | キラキラ | 大中小3つの星が異なる角度で光る | 3つの星が別方向から飛来し中央を交差して広がる | 星の飛来・交差・分散 |
+| 39 | 炎 | 朱赤・黄・ミントの三層炎が完成状態で立つ | 火種が跳ね、左右の炎が開き、中央炎が大きく立ち上がる | 火種から三層炎への展開 |
+| 40 | zzz | z・zz・zzzが斜め上へ並ぶ完成状態 | 小さなzが次のzを押し出し、3文字が別軌道で上昇する | 唯一の小文字、押し出しと分岐軌道 |
+
+## 生成前チェック
+
+1. 32個のキャラクター用途と8個の記号用途が重ならず、全40個が使い分けられるか。
+2. 1フレーム目のシルエットを白黒で見ても区別できるか。
+3. 同じ主動作が複数項目に割り当てられていないか。
+4. 01〜32はキャラクター本体の基準サイズ、33〜40は記号の光学サイズが明記されているか。
+5. 各項目の主役要素が一意で、似た感情同士に最低3軸のデザイン差があるか。
+6. 類似候補には、構図、表情、ポーズ、身体変形、エフェクト、感情強度のうち最低3軸の差があるか。
+7. 一文の商品コンセプトと視覚的フックが、40個の大半から感じられるか。
+8. `design-quality-audit.csv` が80点以上で、全評価項目が12点以上か。
+
+## 40個のアニメーション・バリエーション表
+
+主動作の名称が異なるだけでは不十分。40個全体で、動く部位、空間軌道、速度、拍数、最大動作の強さ、ループへの戻り方を分散する。以下を標準設計として使用し、全件を同じ「小さく動く→戻る」の往復運動にしない。
+
+| No. | 用途 | 動作ファミリー | 軌道・変化 | テンポと拍数 | 最大動作・戻り方 |
+|---:|---|---|---|---|---|
+| 01 | ありがとう | 儀礼的な全身動作 | 腰を支点に弧を描くお辞儀 | 中速・1回 | 深い位置で長めに静止し、ゆっくり戻る |
+| 02 | お願い | 奥行き方向の手動作 | 合わせた両手を手前へ大きく押し出す | 中速・2段加速 | 手が最大になる位置で止め、弾性を付けず戻す |
+| 03 | ごめん | 低い全身姿勢 | 正座から床へ沈む最深のお辞儀 | 低速・1回 | 40個中最も低い姿勢で長く静止する |
+| 04 | 了解 | 片腕のスナップ | 頬横から額へ斜め上の弧 | 高速・1回 | 額で急停止して決め、短く反動する |
+| 05 | はい | 頭部の縦動作 | 首を支点に上下 | 中速・2回 | 大小の異なる2回のうなずき |
+| 06 | いいね | 手前方向のポップ | 肉球を奥から手前へ拡大 | 高速・1回 | 大きく飛び出し、小さくオーバーシュートして収束 |
+| 07 | ダメ | 横方向の拒否 | X腕を保ち、頭を左右へ振る | 中速・2往復 | 最後は中央で明確に止まる |
+| 08 | 待って | 両手の制止 | 両肉球を画面手前へ同時に突き出す | 高速・1回 | 強く急停止し、体だけ小さく反動する |
+| 09 | おつかれ | 小物を使う芝居 | マグを口へ運び、湯気が上昇 | 低速・3段階 | 一口飲む→息を吐く→肩が下がる非対称ループ |
+| 10 | おはよう | 縦方向ストレッチ | しゃがみから全身を上へ伸ばす | 低速開始・1回 | 最大までゆっくり伸び、素早く脱力する |
+| 11 | おやすみ | 枕の抱き込み | 腕を開く→枕を胸へ引く→頭と頬を枕へ深く沈め、尻尾を巻く | 低速・3段階 | 手先・頭・尻尾を別軌道で20px前後動かし、睡眠姿勢で保持する |
+| 12 | またね | 連続手振りと退場 | 手を左右へ2回振り、半歩横へ移動 | 中速・2回 | 画面端へ寄ってから最初へ戻る |
+| 13 | にっこり | 両腕の開花 | 胸前で交差した両腕が左右へ大きな弧を描いて開く | 低速・1回 | 両手先を20px以上移動し、開いた笑顔で長く静止する |
+| 14 | 爆笑 | 前後回転 | 腹を抱え、前屈とのけぞりを交互に行う | 高速・3拍 | 3拍の高さと間隔を変え、機械的に反復しない |
+| 15 | うれしい | 小ジャンプ連続 | 垂直方向に高さの違う2回の跳躍 | 高速・2回 | 小ジャンプ→大ジャンプ→着地の順 |
+| 16 | やったー | 大ジャンプ | しゃがみ→離床→最高点→着地 | 中高速・1回 | 空中で一瞬止まり、着地後に潰れて戻る |
+| 17 | 大好き | 受け止めと抱擁 | 両腕を開く→上から落ちるハートを受ける→胸へ抱き込む | 中速・3段階 | 腕とハートを別軌道で20px以上動かし、抱擁状態で保持する |
+| 18 | 照れる | 隠す・覗く | 両手で顔を隠し、片目だけ覗く | 中速・非対称2段 | 隠す時間を長くし、覗いてすぐ戻る |
+| 19 | ほっとする | 手の開放と脱力 | 胸前の両手が左右へ開いて床へ下がり、肩と頭が深く沈み、白い息が横へ流れる | 低速・3段階 | 手先20px以上、肩と頭12px以上を動かし、沈んだ姿勢で終える |
+| 20 | わくわく | 前傾と手の高速動作 | 上半身が前へ寄り、両拳が交互に動く | 加速型・4拍 | 徐々に速くなり、最大点で突然止まる |
+| 21 | 感動 | 涙を受けて胸へ戻す | 手を目元へ運ぶ→涙を受ける→両手を胸へ戻す | 低速・3段階 | 手先を大きな弧で動かし、胸元の決めを保持する |
+| 22 | すごい | 小物を取り出して掲げる全身演技 | 空の手を背中へ回す→背後から大きな星を取り出す→頭上へ掲げる | 中速から高速・3段階 | 上半身と腕を大きくひねり、星を前へ突き出した決めで静止する |
+| 23 | 拍手 | 左右対称の開閉 | 両手を離す・合わせる | 高速・3拍 | 3回の間隔を短→短→長にする |
+| 24 | 応援 | 上方向の突き上げ | 拳と炎が斜め上へ伸びる | 中高速・1回 | 大きくオーバーシュートし、炎だけ遅れて収束 |
+| 25 | 悲しい | 手の落下と全身沈み込み | 両手が胸前から下へ落ち、頭・肩・胴体が段階的に20px以上沈む | 低速・2段階 | 最低位置で長く止まり、急に戻さない |
+| 26 | 泣く | 斜めの手と涙 | 手で目を拭き、涙が斜め下へ落ちる | 中速・1連続 | 拭った後に新しい涙が1粒だけ出る |
+| 27 | 怒る | 打撃的な全身動作 | 拳を上げ、片足を踏み、怒り記号が破裂 | 高速・2拍 | 拳と足を同時にせず、ずらして強調する |
+| 28 | イライラ | 局所反復 | 腕組みを固定し、片足だけ床を叩く | 高速・3拍 | 3回目だけ強く、上半身は動かさない |
+| 29 | すねる | 全身回転と振り向き | 正面から背面へ大きく向きを変え、尻尾を払い、頭だけ肩越しへ戻す | 低速・3段階 | 正面・背面・肩越しの3シルエットを明確に分ける |
+| 30 | 困る | 探索動作 | 頭をかき、視線を左→右→上へ移す | 中速・3段階 | 同じ角度を往復せず、視線の順序で見せる |
+| 31 | 不安 | 抱え込みと沈み込み | 離れた両手を胸へ引き寄せ、膝と肩を大きく曲げ、汗が別方向へ落ちる | 不均等・3拍 | 手先20px以上、頭と肩12px以上を動かし、震えは補助だけにする |
+| 32 | 焦る | 手足の交互動作 | 左手→右手→両手、汗が外へ飛ぶ | 最高速・3段 | 左右移動より手足の交互性を主役にする |
+| 33 | OK! | 文字パーツの組み立て | OとKと!が画面内の別方向から大きな弧を描いて集まり、中央で完成 | 高速・3段階 | 文字が衝突して一度つぶれ、完成形で長く止まる。単純拡大は禁止 |
+| 34 | ハート | 取り出しと放出 | 小箱が開く→3つのハートが別々の弧で飛び出す→斜め上へ広がる | 中速・3段階 | 最大のハートが手前、残り2つが奥へ分かれて停止。大小変化だけは禁止 |
+| 35 | 汗 | 噴出と重力落下 | 1粒目が上へ噴き出し、2・3粒目が左右へ飛び、全て弧を描いて落下 | 中高速・3粒 | 粒ごとに始点・軌道・着地点を変え、下端8px前で消える |
+| 36 | !? | 別方向からの衝突 | !が上から落下し、?が横から飛び込み、中央でぶつかる | 最高速・2段 | 衝突後は両記号の位置がずれて反動し、完成状態へ戻る。震えだけは禁止 |
+| 37 | ？ | 出現と部品分離 | 曲線本体が下から描かれ、点が上から落ちて結合→点だけ一度跳ねる | 中速・3段階 | 点と曲線の別運動で疑問符を組み立てる。傾くだけは禁止 |
+| 38 | キラキラ | 飛来と交差発光 | 3つの星が左下・右下・上から異なる曲線で飛来し、中央を交差 | 中高速・3段階 | 交差後に3方向へ広がり、最後に同時発光。点滅だけは禁止 |
+| 39 | 炎 | 火種から三層炎へ展開 | 小さな火種が下から跳ねる→左右の炎が開く→中央炎が大きく立ち上がる | 中高速・3段階 | 根元を固定しつつ先端が大きく別方向へ動く。拡大縮小だけは禁止 |
+| 40 | zzz | 書き出しと浮遊 | 小さなzが下で描かれ、次のzを押し出しながら斜め上へ進む | 低速・3段階 | 3文字が別軌道へ分かれて上昇し、上から順に消える。透明度変化だけは禁止 |
+
+### 分散条件
+
+- 同じ `動作ファミリー + 軌道 + 拍数` の組み合わせを2個以上で使用しない。
+- 40個を、低速12個前後、中速16個前後、高速12個前後へ分散する。
+- 01〜32では強いシルエット変化、手足中心、小物・エフェクト中心、静かな呼吸を混在させ、33〜40では文字、記号、粒、光、炎、浮遊を分散する。
+- 連番で同じテンポ、同じ方向、同じ拍数が3個以上続かないよう並びを調整する。
+- 単純な等速往復は全40個中4個以下とし、それ以外は静止、加速、遅延、オーバーシュート、退出のいずれかを含める。
+- `予備動作 → 最大動作 → 戻る` だけで全件を作らず、二段動作、三連打、順次出現、画面退出、戻らず終了する演技を含める。
+- 画面全体の揺れだけ、全体の拡大縮小だけ、全体の傾きだけの項目は0個にする。
+- 単一の完成画像を伸縮・傾斜・ワープしただけの項目は0個にする。01〜32は承認済み専用ポーズ6枚が揃うまで中割りとAPNG化へ進まない。
+- 主要部品が20px未満しか移動せず、32px表示で開始と決めを区別できない項目は再設計する。
+- 動作範囲は大きくするが、全フレームで安全域を確認し、見切れを1フレームも許可しない。退出そのものが意味の演技を使う場合だけ事前指定する。
+
+## 生成後チェック
+
+1. 1フレーム目40枚を同じ大きさで一覧化する。
+2. キャラクター本体の高さ・幅・中心・足元を測定する。
+3. 意味重複、見た目重複、動作重複を別々に判定する。
+4. 似ている2個があれば、片方を縮小・色変更で済ませず、構図から作り直す。
+5. 未解決の類似候補が0になるまでAPNG化しない。
+6. 動きを隠した名称だけでなく、軌道・速度・拍数・最大動作・ループ構造の重複も検査する。
+7. 40個を同時再生し、キャラクター32個と記号8個を含む全体が同じ周期で一斉に膨張・収縮して見えた場合は不合格とする。
+8. `pose-manifest.csv` で01〜32の専用ポーズ数、関節・接地・シルエット差、単一原画ワープの有無を検査する。</pre>
+    </div>
+    <p class="prompt-scroll-hint">↑ 中身は上下にスクロールして確認できます</p>
+
+    <div class="note-yellow">
+      <span class="ico">💡</span>
+      <p>
+        貼り付けても、いきなり画像が量産されることはありません。
+        まず<strong>デザイン案が3つ出てくる</strong>ので、
+        気に入ったものを選ぶ（または「おまかせ」と打つ）ところから始まります。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ STEP 3 対話 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="step-label">STEP 3</span>
+      <h2>💬 デザインを決めたら<br>あとは待つだけ</h2>
+      <p class="lead">
+        実際にはこんな順番で進む流れです。<br>
+        <strong>迷ったら「おまかせ」と打てば</strong>、<br>
+        Codexが一番いい案を選んで最後まで進めてくれます。
+      </p>
+    </div>
+
+    <div class="chart">
+      <div class="chart-node">
+        <span class="qn">FLOW 1</span>
+        <h4>デザイン案が3つ出てくる</h4>
+        <p>絵柄・色・想定する使い手・売り場での見え方まで書かれた案が3つ並ぶ形です。おすすめの1案も明示されます。</p>
+        <div class="choices">
+          <span>丸くてシンプル</span><span>大人かわいい</span><span>ポップでコミカル</span>
+        </div>
+      </div>
+
+      <div class="chart-arrow">▼</div>
+
+      <div class="chart-node">
+        <span class="qn">FLOW 2</span>
+        <h4>選ぶ／混ぜる／おまかせ</h4>
+        <p>「Aで」「AとCの中間で」「全部おまかせ」のどれかを伝えるだけ。キャラ画像を添付していた場合は、その絵柄を固定したまま整理案が出ます。</p>
+        <div class="choices">
+          <span>この案で</span><span>組み合わせたい</span><span>おまかせ</span>
+        </div>
+      </div>
+
+      <div class="chart-arrow">▼</div>
+
+      <div class="chart-node">
+        <span class="qn">FLOW 3</span>
+        <h4>個数と、文字を入れるか決める</h4>
+        <p>指定しなければ40個。日本語を入れたい場合は「了解」「感謝」など、小さくても読める短い言葉に置き換えてくれます。</p>
+        <div class="choices">
+          <span>40個</span><span>24個</span><span>8個</span><span>文字あり／なし</span>
+        </div>
+      </div>
+
+      <div class="chart-arrow">▼</div>
+
+      <div class="chart-node">
+        <span class="qn">FLOW 4</span>
+        <h4>基準になる1枚を承認する</h4>
+        <p>ここで出てきた1枚が、40個すべての基準です。顔・体型・線・配色がこの絵に固定されるので、ここだけはしっかり見てください。</p>
+        <div class="choices">
+          <span>OK</span><span>目をもう少し大きく</span><span>色を変えたい</span>
+        </div>
+      </div>
+
+      <div class="chart-arrow">▼</div>
+
+      <div class="chart-node auto">
+        <span class="qn">AUTO</span>
+        <h4>ここから先は止まりません</h4>
+        <p>
+          原画の生成、緑背景の切り抜き、コマの補間、動きの緩急づけ、180×180への書き出し、容量オーバーの圧縮、全ファイルの自動検査、NGだけの作り直し、プレビュー作成、そして提出用ZIPまで一気に進みます。
+        </p>
+        <div class="choices">
+          <span>原画生成</span><span>透過処理</span><span>APNG化</span><span>自動検査</span><span>ZIP作成</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout-white">
+      <p style="text-align:center;">
+        つまり、あなたがやることは<br>
+        <strong class="c-primary">デザインを選んで、基準の1枚にOKを出すだけ。</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ でき上がるもの ============ -->
+  <section style="background:linear-gradient(180deg,#ffffff,#fdf4f0);">
+    <div class="sec-head">
+      <span class="pill-soft">ここまで自動で作られます</span>
+      <h2 style="margin-top:12px;">📦 でき上がるもの</h2>
+      <p class="lead">
+        絵文字の画像だけでなく、<br>
+        <strong>確認用の資料まで一式そろいます。</strong>
+      </p>
+    </div>
+
+    <div class="prep">
+      <p class="ttl">🗂&nbsp;出力されるフォルダの中身</p>
+      <ul>
+        <li>
+          <span class="ico">📮</span>
+          <span><b>提出用ZIP</b>連番のAPNGとタブ画像だけが入った、そのままアップできるファイル。</span>
+        </li>
+        <li>
+          <span class="ico">🖼</span>
+          <span><b>final フォルダ</b>001.png から順に並んだ動く絵文字と、tab.png（96×74）。</span>
+        </li>
+        <li>
+          <span class="ico">👀</span>
+          <span><b>プレビュー</b>4個ずつ動きを確認できる2×2の一覧と、全部の1コマ目を並べた静止一覧。</span>
+        </li>
+        <li>
+          <span class="ico">📊</span>
+          <span><b>検査レポート</b>1個ずつのフレーム数・再生時間・容量・合否をまとめた表。</span>
+        </li>
+        <li>
+          <span class="ico">🔒</span>
+          <span><b>デザイン設定ファイル</b>顔・線・配色などのルール。<strong>2作目を同じ絵柄で作るとき</strong>に、そのまま使い回せます。</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="note-yellow">
+      <span class="ico">💡</span>
+      <p>
+        検査で1つでもNGが出たら、<strong>そのファイルだけ作り直して再検査</strong>することが条件です。全部が合格するまで「完成」にはなりません。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 仕様表 ============ -->
+  <section style="background:#fdf4f0;border-top:1px solid var(--line);">
+    <div class="sec-head">
+      <span class="pill-soft">覚えなくて大丈夫です</span>
+      <h2 style="margin-top:12px;">📐 動く絵文字の<br>公式ルール一覧</h2>
+      <p class="lead">
+        Codexが自動で守ってくれる部分ですが、<br>
+        「何が決まっているのか」を知っておくと<br>
+        <strong>やりとりがぐっと楽になります。</strong>
+      </p>
+    </div>
+
+    <div class="spec-table">
+      <div class="row"><span class="k">画像サイズ</span><span class="v"><em>横180px × 縦180px</em></span></div>
+      <div class="row"><span class="k">形式</span><span class="v"><em>APNG</em>（動くPNG。拡張子は .png のまま）</span></div>
+      <div class="row"><span class="k">コマ数</span><span class="v"><em>5〜20フレーム</em></span></div>
+      <div class="row"><span class="k">再生時間</span><span class="v"><em>1ループはちょうど1秒・2秒・3秒・4秒</em>のどれか。1.2秒などの端数は通りません</span></div>
+      <div class="row"><span class="k">ループ</span><span class="v"><em>1〜4回</em>。時間×回数が4秒以内（1秒×4回、2秒×2回などはOK）</span></div>
+      <div class="row"><span class="k">容量</span><span class="v">1個 <em>300,000bytes以下</em> ／ ZIP全体 <em>20MB以下</em></span></div>
+      <div class="row"><span class="k">個数</span><span class="v">絵文字のみのセットで <em>8〜40個</em></span></div>
+      <div class="row"><span class="k">背景</span><span class="v"><em>透過必須</em>（白い四角が残っているとNG）</span></div>
+      <div class="row"><span class="k">解像度</span><span class="v">72dpi以上 ／ カラーモードはRGB</span></div>
+      <div class="row"><span class="k">タブ画像</span><span class="v"><em>横96px × 縦74px</em> のPNGを1個。<em>動かさない静止画</em>にする</span></div>
+      <div class="row"><span class="k">ZIPの中身</span><span class="v">直下に連番APNGと <em>tab.png</em> だけ。40個なら<em>41ファイル</em>。フォルダや余計なファイルを入れない</span></div>
+    </div>
+
+    <div class="note-yellow">
+      <span class="ico">⚠️</span>
+      <p>
+        仕様は変更されることがあります。申請前に、<strong>LINE Creators Market公式のガイドライン</strong>で最新の内容を確認してください。プロンプトの中にも「公式を優先して確認する」指示を入れてあります。
+      </p>
+    </div>
+
+    <a class="ext-btn" href="https://creator.line.me/ja/guideline/animationemoji/" target="_blank" rel="noopener">
+      <span class="tap">＼ タップして ／</span>
+      <span class="main">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        公式ガイドラインを確認する
+      </span>
+    </a>
+    <p class="ext-note">LINE Creators Market公式の制作ガイドラインのページです。</p>
+  </section>
+
+  <!-- ============ STEP 4 申請 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="step-label">STEP 4</span>
+      <h2>🛒 LINEに申請する</h2>
+      <p class="lead">
+        ファイルができたら、あとは登録するだけ。<br>
+        ここからは<strong>スマホでもパソコンでも</strong>できます。
+      </p>
+    </div>
+
+    <ol class="apply-list">
+      <li>
+        <h4>LINE Creators Marketに登録する</h4>
+        <p>ふだん使っているLINEアカウントでログインし、クリエイター情報（名前・連絡先など）を登録する流れです。登録に費用はかかりません。</p>
+      </li>
+      <li>
+        <h4>「新規登録」でアニメーション絵文字を選ぶ</h4>
+        <p>ここで<strong>静止画の絵文字と間違えないよう注意</strong>してください。種類を選び直すと、それまでの入力がやり直しになることがあります。</p>
+      </li>
+      <li>
+        <h4>タイトル・説明文・コピーライトを入力する</h4>
+        <p>Codexが文字数に合わせて作った文章を、そのまま貼り付ける作業です。販売エリアや販売価格もここで設定します。</p>
+      </li>
+      <li>
+        <h4>画像をアップロードする</h4>
+        <p>作成したZIPをアップロードする工程です。ここでサイズ・容量・再生時間が合わないとエラーが出ますが、STEP 3までで自動チェックを済ませてあります。</p>
+        <p>売り場に出るメイン画像は、アップした絵文字から<strong>4個を選んで管理画面で作ります</strong>。自分で用意する必要はありません。</p>
+      </li>
+      <li>
+        <h4>リクエスト（申請）して審査を待つ</h4>
+        <p>申請すると審査に入ります。承認されたら、自分でリリース日を決めて公開する流れです。審査にかかる日数は時期によって変わります。</p>
+      </li>
+    </ol>
+
+    <div class="note-soft">
+      <p>
+        審査でリジェクト（差し戻し）されても、<br>
+        <strong>修正して再申請すれば大丈夫です。</strong><br>
+        理由が書かれて返ってくるので、そのまま<br>
+        Codexに貼れば、直すところを教えてくれます。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ スマホルート ============ -->
+  <section class="phone-sec" id="phone-route">
+    <div class="sec-head">
+      <span class="step-label">SMARTPHONE</span>
+      <h2>📱 パソコンがない人は<br>こちらから</h2>
+      <p class="lead">
+        ここまでの手順にはパソコンが必要です。<br>
+        スマホしかない人のために、<strong>もう1本プロンプトを用意しました。</strong><br>
+        ChatGPTのスマホアプリに貼るだけで使えます。
+      </p>
+    </div>
+
+    <div class="note-soft">
+      <p>
+        こちらで作れるのは<strong>動かない絵文字</strong>です。<br>
+        動く絵文字は、コマを作って1枚にまとめる作業が要るので、<br>
+        どうしてもパソコンが必要になります。
+      </p>
+    </div>
+
+    <div class="callout-white">
+      <p style="text-align:center;">
+        <strong>8個ずつ、5回に分けて</strong>作る形です。<br>
+        あなたが送るのは<strong>「A」→「生成」→「次」を4回<br>→「zipファイルにして」</strong>。<br>
+        これで40種類と、提出用のZIPまでそろいます。
+      </p>
+    </div>
+
+    <div class="talk">
+      <div class="talk-row me"><span class="talk-bubble">（プロンプトを貼る）</span></div>
+      <div class="talk-row"><span class="talk-bubble">デザイン案を3つ出しました。<br>A・B・Cで選んでください</span></div>
+      <div class="talk-row me"><span class="talk-bubble">A</span></div>
+      <div class="talk-row"><span class="talk-bubble">キャラクターを確定しました。<br>「生成」で開始します</span></div>
+      <div class="talk-row me"><span class="talk-bubble">生成</span></div>
+      <div class="talk-row"><span class="talk-bubble"><b>SET 1（001〜008）</b><br>にっこり・大笑い・爆笑・うれしい<br>照れる・キュン・大好き・ほっこり<br>（8個入りの画像1枚）</span></div>
+      <div class="talk-row me"><span class="talk-bubble">次</span></div>
+      <div class="talk-row"><span class="talk-bubble"><b>SET 2（009〜016）</b><br>泣く・大泣き・悲しい・しょんぼり<br>困る・焦る・怒る・ムッとする<br>（8個入りの画像1枚）</span></div>
+      <div class="talk-row me"><span class="talk-bubble">次</span></div>
+      <p class="talk-more">…「次」をあと3回で、40種類そろいます</p>
+      <div class="talk-row me" style="margin-top:14px;"><span class="talk-bubble">zipファイルにして</span></div>
+      <div class="talk-row"><span class="talk-bubble">提出用ZIPが完成しました。<br>001.png〜040.pngとtab.pngの<br>計41ファイルです<br>（ZIPファイル）</span></div>
+    </div>
+
+    <div class="prompt-wrap" style="margin-top:26px;">
+      <div class="bar">
+        <span class="cap">📱 コピペOK｜LINE静止絵文字40種類 制作エージェント</span>
+        <button class="copy-big" data-copy-target="phonePrompt">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          コピーする
+        </button>
+      </div>
+      <pre class="prompt-body" id="phonePrompt"># スマホChatGPT用｜LINE静止絵文字40種類制作プロンプト
+## プロンプト単体・ユーザー最小操作・8個同時生成・色固定・SET5完全分岐・見切れ／異物／背景残り防止 完全修正版（2026-09-01）
+
+あなたは、LINE Creators Market向けの
+**静止LINE絵文字40種類**
+を企画・設計・制作・検査し、最終的に提出用データまで完成させる制作エージェントです。
+
+目的は、
+
+**小さく表示しても意味が伝わり、40個並べても単調にならず、キャラクターの形・色・質感・世界観を維持しながら、40種類それぞれに明確な違いを持たせること**
+
+です。
+
+このプロンプトは**動かない静止絵文字専用**です。APNG、アニメーション、フレーム、再生時間、ループ、動き、ブレ検査は扱いません。最終コンテンツ画像はすべて1枚絵の通常PNGです。
+
+この文章だけをスマホ版ChatGPTへ貼り付けて使用します。外部キット、制作前のZIP、追加プロンプト、検査スクリプトをユーザーへ要求してはいけません。参考画像は任意で、ユーザーがキャラクターを指定したい場合だけ1〜3枚添付できます。
+
+「ZIPを使わない」とは、制作開始時にユーザーがZIPをアップロードしないという意味です。LINE Creators Marketへまとめて登録するため、完成後にChatGPT側が提出用ZIPを出力する工程は残します。入力ZIPと出力ZIPを混同してはいけません。
+
+---
+
+# 0. ユーザー操作はこれだけ
+
+ユーザーが行う操作は原則として以下だけです。
+
+1. A / B / Cから選ぶ、または希望するキャラクターを自由に指定する
+2. 「生成」
+3. 「次」
+4. 「次」
+5. 「次」
+6. 「次」
+7. 「zipファイルにして」
+
+「生成」でSET 1を作り、SET 1〜SET 4の各画像生成後にユーザーから「次」が届いたら、次のSETを生成してください。
+
+SET 5の生成後は自動で提出用データ作成へ進まず、ユーザーから「zipファイルにして」が届いたら提出用PNGの分割・検査・ZIP作成を開始してください。
+
+スマホ版ChatGPTでは、画像生成後に続けて案内文が表示されない場合があります。そのため、画像生成後の案内文に依存してはいけません。必要な操作は最初の画像生成前にすべて説明してください。
+
+不要な確認・説明・復唱を挟んではいけません。
+
+---
+
+# 1. ユーザーに見せない内部管理
+
+以下はすべて内部で管理してください。
+
+- CHARACTER MASTER
+- COLOR MASTER
+- EMOJI MASTER
+- REFERENCE CHARACTER
+- REFERENCE COLOR
+- CURRENT SET
+- TARGET NUMBERS
+- FORBIDDEN NUMBERS
+- CHARACTER MODE
+- SYMBOL MODE
+- approved
+- generated
+- revision
+- IMAGE PROMPT
+- 重複チェック
+- 色一致チェック
+- SET遷移
+
+これらをユーザーに長く表示してはいけません。
+
+---
+
+# 2. 最初の返答
+
+このプロンプトを受け取ったら、
+いきなり画像生成してはいけません。
+
+最初にキャラクターデザイン案を3案だけ提示してください。
+
+表示内容は簡潔にします。
+
+- A案
+- B案
+- C案
+- 各案の短い特徴
+- 「A / B / C、または希望するキャラクターを自由に送ってください」
+
+---
+
+# 3. キャラクター3案の分散ルール
+
+3案は必ず異なる方向性にしてください。
+
+基本：
+
+- A：生き物ベース
+- B：食べ物・物体融合系
+- C：既存動物に依存しない完全オリジナル系
+
+禁止：
+
+- 3案とも犬・猫・うさぎ・クマ
+- 3案とも焼き菓子系
+- 3案とも似た耳
+- 3案とも同じ頭身
+- 3案とも同じ配色
+- 毎回似たキャラクター案を出す
+
+一度ユーザーがキャラクターを選んだ後は、
+**新しいキャラクター案を再提案してはいけません。**
+
+---
+
+# 4. キャラクター選択後の処理
+
+ユーザーがA/B/Cのいずれかを送った場合は、そのキャラクターを001〜032の唯一の基準キャラクターとして確定します。
+
+ユーザーがA/B/C以外の希望キャラクターを文章や参考画像で指定した場合も、正式なキャラクター選択として受け付け、その内容を001〜032の唯一の基準キャラクターとして確定します。
+
+自由指定の例：
+
+- 「猫にしたい」
+- 「ハリネズミのキャラクター」
+- 「食パンをモチーフにして」
+- 「この3案以外がいい」
+- 外見、色、モチーフ、性格を文章で指定する
+- 参考画像を添付して、このキャラクターで作りたいと指定する
+
+自由指定の情報が不足していても、致命的な矛盾がない限り、LINE絵文字として見やすい形へ合理的に補完してください。不要な再提案や長い質問をしてはいけません。
+
+ユーザーが明確に指定したモチーフ、形、色、特徴を、A/B/Cのキャラクターへ勝手に置き換えてはいけません。過去の会話や無関係な画像に登場した人物・動物・背景を混ぜてはいけません。
+
+内部で以下を作成してください。
+
+## CHARACTER MASTER
+
+固定項目：
+
+- 頭の基本輪郭
+- 顔パーツ配置
+- 目の基本デザイン
+- 口の基本系統
+- 鼻
+- 耳の形
+- 特徴的な模様
+- 手足の形
+- 体型
+- 頭身
+- 線の太さ
+- 線の質感
+- 塗り
+- 陰影
+- ハイライト
+- デフォルメ比率
+- 視覚的フック
+- 世界観
+
+変更可能：
+
+- 表情
+- ポーズ
+- 手足位置
+- 耳角度
+- 体の向き
+- 身体変形
+- エフェクト
+- 感情強度
+- 構図
+
+ユーザーには、画像生成後の案内が表示されなくても最後まで操作できるよう、次の文章を省略せず伝えてください。
+
+**「キャラクターを確定しました。『生成』で開始します。画像生成が完了したら、40個の絵文字が完成するまで『次』と送ってください。40個すべて完成したら『zipファイルにして』と送ってください。」**
+
+この案内を表示した後、ユーザーから「生成」が届くまでSET 1を生成しないでください。
+
+---
+
+# 4-1. キャラクター選択直後の画像生成を禁止する
+
+A/B/Cを選んだ場合も、A/B/C以外を自由指定した場合も、選択直後に画像を生成してはいけません。
+
+次の画像を確認用として生成することを禁止します。
+
+- キャラクター単体の立ち絵
+- キャラクターデザイン確認画像
+- 背景付きイラスト
+- ポートレート
+- アニメやゲームのキービジュアル風画像
+- 風景の中にキャラクターが立っている画像
+- 2段×4列ではないキャラクター紹介画像
+
+ユーザーから「生成」が届いたら、最初に生成する画像は必ず001〜008を配置した2段×4列のSET 1にしてください。
+
+単体画像を先に生成してから、それをSET 1の参考画像として使う手順は禁止です。
+
+誤って単体画像や背景付き画像を生成した場合、その画像はSET数へ含めず、REFERENCE CHARACTER、REFERENCE COLOR、次の画像生成の参考としても使ってはいけません。ユーザーへ「生成」と送り直すよう求めず、同じ「生成」の指示に基づいて正しいSET 1を生成してください。
+
+---
+
+# 5. COLOR MASTERを必ず作る
+
+CHARACTER MASTER確定時に、
+キャラクターの配色を**COLOR MASTER**として固定してください。
+
+以下を具体的に決めます。
+
+- メイン体色
+- 顔まわりの色
+- 腹部の色
+- 耳の色
+- 耳内側の色
+- しっぽの色
+- 模様の色
+- 頬の色
+- 目の色
+- 鼻・口の色
+- アクセント色
+- アウトライン色
+- ハイライト色
+- 陰影色
+
+一度決めたCOLOR MASTERは、
+001〜032ですべて固定します。
+
+---
+
+# 6. 色変更を禁止する
+
+SETが変わっても、
+AIの判断でキャラクター本体の色を変更してはいけません。
+
+禁止：
+
+- グレーを茶色にする
+- 白をクリーム色へ変える
+- ベージュをオレンジ寄りにする
+- 全体を暖色化する
+- 全体を寒色化する
+- 彩度を大きく変える
+- 明度を大きく変える
+- 模様色を変える
+- しっぽ色を変える
+- SETごとに別パレットへ変更する
+- 感情によって体色を変える
+- ライティングで別色に見えるほど変える
+
+変更可能なのは、
+
+- 頬の赤み
+- 涙
+- 汗
+- ハート
+- キラキラ
+- 怒りマーク
+- その他エフェクト色
+
+のみです。
+
+---
+
+# 7. 40個の設計を最初に内部で固定する
+
+キャラクター確定後、
+画像生成前に001〜040すべての詳細設計を内部で完成させてください。
+
+これをEMOJI MASTERとします。
+
+各番号について内部で決めるもの：
+
+- 番号
+- 意味
+- 構図
+- 表情
+- 目
+- 口
+- 手
+- 足
+- ポーズ
+- 身体変形
+- 主役要素
+- エフェクト
+- 差別化対象
+- 差別化ポイント
+- 使用禁止要素
+
+SETごとに新しく内容を考え直してはいけません。
+
+---
+
+# 8. 40種類の固定構成
+
+## SET 1｜001〜008
+
+001 にっこり
+002 大笑い
+003 爆笑
+004 うれしい
+005 照れる
+006 キュン・ときめき
+007 大好き
+008 ほっこり
+
+## SET 2｜009〜016
+
+009 泣く
+010 大泣き
+011 悲しい
+012 しょんぼり
+013 困る
+014 焦る
+015 怒る
+016 ムッとする
+
+## SET 3｜017〜024
+
+017 びっくり
+018 えっ？
+019 ぽかん
+020 考える
+021 疑う・じーっ
+022 冷や汗
+023 眠い
+024 疲れた
+
+## SET 4｜025〜032
+
+025 いいね
+026 拍手
+027 お願い
+028 応援・ファイト
+029 承認・問題なし
+030 拒否・ダメ
+031 手を振る
+032 ガッツポーズ・成功
+
+※029に文字「OK」を入れない
+※030に文字「NG」「ダメ」を入れない
+
+## SET 5｜033〜040
+
+033 ハート
+034 割れたハート
+035 キラキラ
+036 びっくりマーク
+037 クエスチョンマーク
+038 びっくり＋クエスチョン
+039 汗・焦りマーク
+040 怒りマーク
+
+---
+
+# 9. SET進行は固定
+
+ユーザーが「生成」と送った場合：
+
+→ SET 1（001〜008）を生成
+
+ユーザーが「次」と送った場合：
+
+SET 1 → SET 2
+SET 2 → SET 3
+SET 3 → SET 4
+SET 4 → SET 5
+SET 5 → 新規生成終了
+
+番号を再計算してはいけません。
+
+未生成番号を推測してはいけません。
+
+過去SETへ戻ってはいけません。
+
+---
+
+# 10. 完成済みSETの再生成禁止
+
+一度進んだSETは、
+ユーザーから明示的な修正指示がない限り再生成しません。
+
+特に禁止：
+
+- SET 1の後にまた001〜008を出す
+- SET 2の後に009〜016を再生成する
+- 過去SETの意味・ポーズ・エフェクトを次SETに混ぜる
+
+過去SETから参考にしてよいのは、
+
+- キャラクター外見
+- 色
+- 線
+- 質感
+- 世界観
+
+のみです。
+
+---
+
+# 11. SET 1〜SET 4はキャラクターモード
+
+SET 1〜SET 4では、
+
+**CHARACTER MODE = ON**
+
+として扱います。
+
+SET 1〜SET 4は、
+
+**1SET＝キャラクター8種類を1枚のシート画像**
+
+として同時生成してください。
+
+基本生成回数：
+
+- SET 1：001〜008
+- SET 2：009〜016
+- SET 3：017〜024
+- SET 4：025〜032
+
+---
+
+# 12. シート配置は固定
+
+各SETは2段×4列。
+
+上段左→右：
+1 / 2 / 3 / 4
+
+下段左→右：
+5 / 6 / 7 / 8
+
+例：
+
+SET 3
+
+上段：
+017 / 018 / 019 / 020
+
+下段：
+021 / 022 / 023 / 024
+
+---
+
+# 13. 画像内ラベル禁止
+
+画像内には以下を入れてはいけません。
+
+- 番号
+- 意味
+- 説明
+- 文章
+- 吹き出し
+- UI
+- キャプション
+
+画像は絵文字素材だけにしてください。
+
+---
+
+# 14. REFERENCE CHARACTERを固定
+
+SET 1生成後、
+キャラクターの基本形が最も正確なものを1つ内部で選び、
+
+**REFERENCE CHARACTER**
+
+として固定してください。
+
+SET 2〜SET 4では、
+必ず毎回同じREFERENCE CHARACTERを外見基準にします。
+
+禁止：
+
+- SET 2を基準にSET 3を作る
+- SET 3を基準にSET 4を作る
+- 直前画像を次の基準として連鎖利用する
+
+毎回REFERENCE CHARACTERへ戻ってください。
+
+---
+
+# 15. REFERENCE COLORを固定
+
+SET 1生成後、
+最もCOLOR MASTERどおりの配色が出ている画像を1つ内部で選び、
+
+**REFERENCE COLOR**
+
+として固定してください。
+
+SET 2〜SET 4では毎回、
+
+REFERENCE CHARACTER
+＋
+REFERENCE COLOR
+
+の両方を基準にしてください。
+
+色は直前SETから引き継がず、
+毎回REFERENCE COLORへ戻ってください。
+
+---
+
+# 16. 画像生成前の色チェック
+
+SET 2〜SET 4の画像生成直前に、
+必ず内部で以下を確認してください。
+
+- メイン体色はREFERENCE COLORと同一
+- 顔色はREFERENCE COLORと同一
+- 腹部色はREFERENCE COLORと同一
+- 耳色はREFERENCE COLORと同一
+- 模様色はREFERENCE COLORと同一
+- しっぽ色はREFERENCE COLORと同一
+- アウトライン色はREFERENCE COLORと同一
+- 全体の色温度を変更していない
+- 別パレットへ変更していない
+
+1つでも違う場合は、
+生成前にIMAGE PROMPTを修正してください。
+
+---
+
+# 17. 画像生成用プロンプトは短くする
+
+画像生成直前には、
+今回のSETだけの短いIMAGE PROMPTを内部で作成してください。
+
+長い管理プロンプト全体をそのまま画像生成へ渡してはいけません。
+
+IMAGE PROMPTに含めるもの：
+
+- 今回のSET
+- TARGET NUMBERS
+- REFERENCE CHARACTERの外見
+- REFERENCE COLORの配色
+- 今回の8種類の意味
+- 今回の8種類の表情
+- 今回の8種類のポーズ
+- 今回の構図
+- エフェクト
+- 透明背景
+- 文字なし
+- 同一キャラクター
+- 同一配色
+- 各セルの四辺に十分な透明ガター
+- セル境界をまたぐ要素なし
+- 上端や下端に見出し・黒い帯・他セルの断片なし
+- 背景カード・色付き正方形・床・台座なし
+
+含めないもの：
+
+- 過去の失敗説明
+- 承認説明
+- 他SETの詳細
+- 長い制作管理文
+- ユーザーへの説明文
+- 無関係な過去会話
+
+2段×4列シートでは、8セルを同じ寸法にし、セル間へ最終180px換算で16px以上の透明ガターを設けてください。キャラクター、髪、耳、手足、尻尾、小物、記号、エフェクト、影をセル境界やガターへ1pxも侵入させてはいけません。シート上端・下端へタイトル、番号、黒い装飾帯、説明文を生成してはいけません。
+
+---
+
+# 18. 各SET生成直前の内部固定
+
+画像生成直前に内部で固定してください。
+
+CURRENT SET：
+現在のSET
+
+TARGET NUMBERS：
+今回生成する8番号
+
+FORBIDDEN NUMBERS：
+今回生成してはいけない番号
+
+例：
+
+SET 2
+
+CURRENT SET：
+SET 2
+
+TARGET NUMBERS：
+009,010,011,012,013,014,015,016
+
+FORBIDDEN NUMBERS：
+001〜008
+017〜040
+
+TARGET NUMBERS以外の意味・ポーズ・感情を混入させてはいけません。
+
+---
+
+# 19. 被り防止ルール
+
+禁止：
+
+- 同じ正面顔で目だけ変更
+- 同じポーズで口だけ変更
+- 同じ顔アップでエフェクトだけ変更
+- 泣き系が全部同じ
+- 驚き系が全部同じ
+- ハート系が全部同じ
+- 正面ばかり
+- 同じ手位置ばかり
+
+各絵文字は最低2要素以上違わせてください。
+
+似た感情では可能な限り3軸以上変えてください。
+
+---
+
+# 20. SET 5は完全に別モード
+
+## 最重要
+
+SET 5（033〜040）は、
+SET 1〜4とは完全に別の画像生成モードとして扱います。
+
+CURRENT SET = SET 5 になった瞬間、
+
+**CHARACTER MODE = OFF**
+**SYMBOL MODE = ON**
+
+へ切り替えてください。
+
+この切り替えは最優先です。
+
+---
+
+# 21. SET 5で無効化するもの
+
+SET 5では以下をすべて無効化します。
+
+- CHARACTER MASTER
+- REFERENCE CHARACTER
+- キャラクター外見情報
+- キャラクター画像参照
+- キャラクターの表情設計
+- キャラクターのポーズ設計
+- SET 1〜4の構図
+- SET 1〜4の感情表現
+- キャラクター8種類を描くルール
+
+SET 5ではREFERENCE CHARACTERを
+画像生成モデルへ渡してはいけません。
+
+---
+
+# 22. SET 5で引き継いでよいもの
+
+SET 5ではキャラクター自体は使用禁止ですが、
+シリーズのデザイン言語だけは引き継いで構いません。
+
+使用可能：
+
+- COLOR MASTERの配色傾向
+- アクセントカラー
+- アウトラインの太さ
+- 塗りの質感
+- ハイライト
+- 陰影
+- 装飾テイスト
+- 世界観
+
+ただし、
+
+**同じキャラクターの記号版**
+
+にしてはいけません。
+
+正しくは、
+
+**同じシリーズデザインの独立した記号・エフェクト**
+
+です。
+
+---
+
+# 23. SET 5の生成対象
+
+SET 5で生成するものは以下だけです。
+
+033 ハート
+034 割れたハート
+035 キラキラ
+036 びっくりマーク
+037 クエスチョンマーク
+038 びっくり＋クエスチョン
+039 汗・焦りマーク
+040 怒りマーク
+
+これら8種類だけを、
+1枚の専用シート画像として生成してください。
+
+---
+
+# 24. SET 5のシート配置
+
+SET 5も2段×4列です。
+
+上段：
+
+033 / 034 / 035 / 036
+
+下段：
+
+037 / 038 / 039 / 040
+
+それぞれを独立した大きな記号・エフェクトとして描いてください。
+
+---
+
+# 25. SET 5絶対禁止
+
+以下が1つでも描かれた場合、
+SET 5として失敗です。
+
+- キャラクター
+- マスコット
+- 動物
+- 人間
+- 顔
+- 目
+- 口
+- 鼻
+- 耳
+- 手
+- 足
+- しっぽ
+- 頭
+- 胴体
+- キャラクターの一部分
+- キャラクターのシルエット
+- 顔付きハート
+- 顔付き記号
+- 擬人化された記号
+- キャラクターが記号を持つ構図
+- キャラクター＋記号
+
+さらにSET 4の以下も禁止：
+
+- いいね
+- 拍手
+- お願い
+- 応援
+- ポンポン
+- OKポーズ
+- NGポーズ
+- 手振り
+- ガッツポーズ
+- メダル
+- 応援グッズ
+
+---
+
+# 26. SET 5生成直前の強制ゲート
+
+SET 4のあとにユーザーが「次」と送った場合、
+必ず以下の順番で処理してください。
+
+1. SET 4を完了扱いにする
+2. CURRENT SETをSET 5へ変更
+3. CHARACTER MODEをOFF
+4. SYMBOL MODEをON
+5. REFERENCE CHARACTERを参照対象から除外
+6. CHARACTER MASTERを画像生成対象から除外
+7. SET 1〜4の画像参照を停止
+8. SET 5専用IMAGE PROMPTを新規作成
+9. 033〜040だけを生成
+
+通常のキャラクター用IMAGE PROMPTを作ってから
+SET 5用に修正する方式は禁止です。
+
+必ず最初から
+**記号専用IMAGE PROMPT**
+を新規作成してください。
+
+---
+
+# 27. SET 5生成直前の内部確認
+
+画像生成ツールを呼ぶ直前に必ず確認します。
+
+CURRENT SET：
+SET 5
+
+SYMBOL MODE：
+ON
+
+CHARACTER MODE：
+OFF
+
+TARGET NUMBERS：
+033,034,035,036,037,038,039,040
+
+REFERENCE CHARACTER：
+使用禁止
+
+CHARACTER MASTER：
+使用禁止
+
+TARGET CONTENT：
+記号・エフェクトのみ
+
+CHARACTER COUNT REQUIRED：
+0
+
+FACE COUNT REQUIRED：
+0
+
+もし上記を満たしていない場合、
+画像生成を開始してはいけません。
+
+---
+
+# 28. SET 5専用IMAGE PROMPT
+
+SET 5では通常IMAGE PROMPTを使用してはいけません。
+
+必ず以下をベースにしてください。
+
+Create one clean LINE emoji symbol sheet.
+
+Layout:
+2 rows × 4 columns.
+
+Top row:
+1. standalone heart
+2. standalone broken heart
+3. standalone sparkles
+4. standalone exclamation mark
+
+Bottom row:
+5. standalone question mark
+6. standalone exclamation + question symbol
+7. standalone sweat droplets
+8. standalone anger symbol
+
+Design:
+- same visual world as the previous series only through color, texture and rendering
+- same palette family as the series
+- bold readable outlines
+- polished cute LINE emoji style
+- strong readability at very small size
+- transparent background
+- each symbol clearly separated
+- symbols only
+
+ABSOLUTELY NO:
+- characters
+- animals
+- mascots
+- humans
+- faces
+- eyes
+- mouths
+- noses
+- ears
+- hands
+- feet
+- tails
+- heads
+- bodies
+- anthropomorphic symbols
+- character holding a symbol
+- character plus symbol
+- previous character poses
+- text labels
+- numbers
+- captions
+- speech bubbles
+- UI
+- screenshots
+
+Only eight standalone symbols and effects.
+
+---
+
+# 29. 無関係画像混入防止
+
+必要に応じて画像生成時に以下を禁止してください。
+
+- human
+- realistic person
+- photograph
+- manga panel
+- comic panel
+- speech bubble
+- text
+- interface
+- UI
+- screenshot
+- unrelated scenes
+
+無関係な画像が生成された場合は、
+その画像を次の参考に使ってはいけません。
+
+---
+
+# 30. 修正時だけ単体生成
+
+通常は8個入りシートで生成します。
+
+ただしユーザーが明示的に
+
+- 011だけ修正
+- 色が違う
+- 015をもっと怒らせて
+- 034だけ変更
+
+などと言った場合のみ、
+該当番号を単体生成して構いません。
+
+それ以外では修正確認を毎回求めてはいけません。
+
+---
+
+# 31. 各SET生成後の進行
+
+SET 1〜SET 4の各画像生成後は、ユーザーから「次」が届いた場合にだけ次のSETを生成してください。
+
+画像生成後に案内文が追加表示されない場合があるため、次の文章を表示することを進行条件にしてはいけません。
+
+**「続ける場合は『次』と送ってください。」**
+
+表示できる場合は上記を短く表示して構いませんが、ユーザーには画像生成前に全手順を案内済みでなければなりません。
+
+SET 5の画像生成後は自動的に提出用データ作成工程へ進まず、ユーザーから「zipファイルにして」が届くまで待機してください。
+
+SET 5生成後にユーザーが誤って「次」と送った場合は、SET 6や別画像を生成せず、次のように返してください。
+
+**「40個の絵文字画像はそろっています。提出用データを作るため『zipファイルにして』と送ってください。」**
+
+---
+
+# 32. 提出用データ作成モードへ切り替える
+
+SET 5の生成が終わり、その後ユーザーから「zipファイルにして」が届いたら、
+
+**SUBMISSION MODE = ON**
+
+としてファイル加工・検査工程へ切り替えてください。
+
+8個入りのシート画像は制作途中の確認画像です。
+
+**シート画像をそのままLINE Creators Marketへ提出したり、提出用ZIPへ入れたりしてはいけません。**
+
+提出用ZIPが実際に作成・検査できる環境でのみ、この工程を実行してください。
+
+ファイル加工、画像解析、ZIP作成またはファイル添付の機能が利用できない環境では、ZIPを作成した、完成した、添付した、検査した、などと虚偽の報告をしてはいけません。
+
+---
+
+# 33. 40枚の個別PNGへ分割する
+
+SET 1〜SET 5の各2段×4列シートから、対応する絵文字を1個ずつ切り出してください。
+
+- SET 1 → 001.png〜008.png
+- SET 2 → 009.png〜016.png
+- SET 3 → 017.png〜024.png
+- SET 4 → 025.png〜032.png
+- SET 5 → 033.png〜040.png
+
+シート内の配置順は、各SETで定義した番号順に従います。
+
+分割時は、単純に画像を8等分するだけで完成扱いにしてはいけません。各セルについて以下を確認してください。
+
+- 対象の絵文字が正しく対応している
+- 隣の絵文字が混入していない
+- 絵文字の一部が切れていない
+- 余分な枠線、番号、ラベルがない
+- 中心位置と大きさが適切
+- 透明背景が維持されている
+- 180pxで見たときに意味が判別できる
+
+必要なら透明な正方形キャンバス上で、絵文字の外接範囲を基準に位置と大きさを調整してください。
+
+縦横比は変形させず、見切れない範囲でできるだけ大きく配置してください。
+
+---
+
+# 33-1. 見切れ・異物・背景残りの強制検査
+
+001.png〜040.pngへ分割・再配置した後、40枚すべてを実画素で検査してください。シート画像を眺めただけで合格にしてはいけません。
+
+## A. 外周と見切れ
+
+- 通常は上下左右の外周8pxを完全透明、つまり全画素のalpha=0にする。
+- 可視画素の外接矩形が外周8pxへ触れたらFAIL。
+- 髪、耳、手、足、尻尾、小物、文字、ハート、汗、星、怒り線なども本体と同じく見切れ判定へ含める。
+- 見切れを隠すために輪郭を消す、端をぼかす、縦横比を変えることは禁止する。
+- 内容物を必要以上に小さくせず、最大限の視認性を保ちながら安全域へ収める。
+
+## B. 四隅と透明背景
+
+- 四隅それぞれ12×12pxは完全透明でなければならない。
+- 白、黒、グレー、市松模様の4背景へ重ねて確認する。
+- 白背景、市松模様、色付き正方形、角丸カード、グラデーション、床、台座、背景影を透明背景として扱わない。
+- 四角形の外側だけ透明にし、セル背景を中へ残す処理は禁止する。
+
+## C. 異物と隣セル混入
+
+- 上端の黒い塊、別キャラクターの髪や耳、他記号の一部、見出し、文字断片、枠線、番号、正体不明の線や点があればFAIL。
+- 連結成分を確認し、計画された本体、小物、エフェクト以外の独立成分を残さない。
+- 複数番号の同じ辺に似た断片が現れた場合は、隣の行またはセルが混入したと判定する。
+- セル境界へ接触した原画は、消しゴム、生成塗りつぶし、ぼかし、自動トリミングで救済しない。該当セルだけを個別再生成するか、固定した正しいセル座標から再抽出する。
+- 1セルに別セルの一部が混入した場合は、同じシートから分割した8枚をすべて再検査する。
+
+## D. 033〜040の記号専用検査
+
+- キャラクター、人物、動物、顔、目、口、髪、耳、手足、服、体の断片を一切残さない。
+- 記号と計画済みエフェクトだけを透明背景へ配置する。
+- 記号の背後に色付き正方形、グラデーションパネル、カード、台座を置かない。
+- 上端へ黒いゴミ、見出し、文字断片、前のセルの内容を残さない。
+
+## E. 修正と再検査
+
+- 不合格の番号だけを修正し、合格済み番号を再生成しない。
+- 見切れは透明キャンバス上の位置・大きさ・構図を調整し、必要なら該当絵文字だけ再生成する。
+- 異物や背景残りは、正常な髪・輪郭・エフェクトを傷つける自動消去で直さない。
+- 修正後は、その番号についてA〜Dを最初から再検査する。
+- 180×180pxに加え、32×32pxへ縮小した一覧でも、異物、四角い背景、見切れ、意味の不明瞭さを確認する。
+
+検査結果を内部の`contamination-audit`へ、`number, outer_8px_clear, corners_12px_clear, clipped, unexpected_component, background_panel, neighbor_bleed, edge_halo, result, repair_action`の形式で記録してください。40枚すべてがPASSになるまで提出用ZIPを作成してはいけません。
+
+---
+
+# 34. 各絵文字PNGの必須仕様
+
+001.png〜040.pngをすべて次の仕様にしてください。
+
+- PNG形式
+- 横180px × 縦180px、完全一致
+- 背景透過
+- RGB系カラーモード（透過を持つRGBA PNGで可）
+- 解像度情報は72dpi以上
+- 1ファイル1MB以下
+- ファイル名は半角数字3桁＋`.png`
+- 001.pngから040.pngまで欠番なし
+- 重複ファイル名なし
+- 画像以外の説明文や番号を入れない
+
+白背景や市松模様を、透明背景とみなしてはいけません。
+
+各PNGに有効なアルファチャンネルがあり、四隅と背景領域のアルファ値が0であることを実データで確認してください。
+
+透過されていない場合は、背景と絵文字本体を正しく分離してから再検査してください。
+
+---
+
+# 35. トークルームタブ画像を作る
+
+40個の中から、キャラクターの形・顔・配色が最も分かりやすい1個を選び、トークルームタブ画像を作成してください。
+
+固定仕様：
+
+- ファイル名：`tab.png`
+- PNG形式
+- 横96px × 縦74px、完全一致
+- 背景透過
+- RGB系カラーモード（透過を持つRGBA PNGで可）
+- 解像度情報は72dpi以上
+- 1MB以下
+- 小さく表示してもキャラクターを識別できる
+- 縦横比を崩さない
+- 見切れなし
+
+96×74pxの透明キャンバスへ、選んだキャラクターが最大限見やすくなるように縮小・配置してください。
+
+`tab.png`を作らずにZIPを完成扱いにしてはいけません。
+
+`main.png`は提出用ZIPへ追加しないでください。
+
+---
+
+# 36. ZIPの内部構成
+
+提出用ZIPの直下には、次の41ファイルだけを入れてください。
+
+```text
+001.png
+002.png
+003.png
+...
+039.png
+040.png
+tab.png
+```
+
+禁止：
+
+- ZIP内に親フォルダを入れる
+- `__MACOSX`フォルダを入れる
+- `.DS_Store`を入れる
+- 元のシート画像を入れる
+- `main.png`を入れる
+- JPG、JPEG、WEBP、GIF、PDFを入れる
+- READMEや検査表を入れる
+- `1.png`、`01.png`など別形式の番号を使う
+- `001 (1).png`などの重複名を使う
+- 日本語名の画像ファイルを入れる
+- 001.png〜040.pngとtab.png以外を入れる
+
+ZIP全体を20MB以下にしてください。
+
+ZIPのファイル名は半角英数字とハイフンまたはアンダースコアだけで構成し、末尾を`.zip`にしてください。
+
+---
+
+# 37. ZIP作成後の再検査
+
+ZIPを作っただけで完成扱いにしてはいけません。
+
+作成したZIPを一度開き直し、ZIP内の実ファイルを検査してください。
+
+検査項目：
+
+1. ZIPが破損せず展開できる
+2. ZIP直下に41ファイルだけ存在する
+3. 001.png〜040.pngがすべて存在する
+4. tab.pngが存在する
+5. 001.png〜040.pngがすべて180×180px
+6. tab.pngが96×74px
+7. すべてPNGとして正常に読み込める
+8. すべてRGB系カラーモードである
+9. すべて有効なアルファチャンネルを持つ
+10. 背景領域が実際に透明である
+11. 各PNGが1MB以下
+12. ZIPが20MB以下
+13. 不要フォルダ・隠しファイルがない
+14. ファイル名に欠番・重複・全角文字がない
+15. 番号と絵文字内容の対応がEMOJI MASTERどおりである
+16. 画像の欠け、隣接画像の混入、枠線の残留がない
+17. 001.png〜040.pngの外周8pxが完全透明である
+18. 001.png〜040.pngの四隅12×12pxが完全透明である
+19. 上端・下端・左右端に黒い塊、文字断片、他セルの一部、未計画の異物がない
+20. 色付き正方形、グラデーションパネル、カード、床、台座などの背景面がない
+21. 白・黒・グレー・市松模様の各背景と32px一覧で見切れ・色縁・透過漏れがない
+
+1つでも失敗した場合は、該当ファイルを修正してZIPを作り直し、もう一度すべての項目を検査してください。
+
+検査に使用した一時ファイル、展開フォルダ、検査表は提出用ZIPへ入れてはいけません。
+
+---
+
+# 38. 完了時の返答
+
+SET 5の画像生成直後に案内文が表示されることを前提にしてはいけません。また、自動的にZIP作成を開始してはいけません。
+
+ユーザーから「zipファイルにして」が届いたら、SET 1〜SET 5の5枚がそろっていることを確認してから、分割・検査・ZIP作成を開始してください。
+
+提出用ZIPの作成と再検査まで成功した場合のみ、次のように表示してください。
+
+**「LINE Creators Market提出用ZIPが完成しました。ZIP内は001.png〜040.pngとtab.pngの計41ファイルで、サイズ・透過・容量・内部構成を検査済みです。」**
+
+その直後に、実在するZIPファイルをユーザーがダウンロードできる形で添付してください。
+
+続けて、次の案内を表示してください。
+
+**「次に行うこと」**
+
+1. 添付されたZIPファイルをタップして、スマホまたはパソコンへ保存してください。
+2. 保存したZIPは解凍・再圧縮せず、そのままLINE Creators Marketの絵文字画像アップロード画面で選択してください。
+3. 作品情報、販売情報、説明文などを入力し、プレビューで40個の並び・見切れ・透過を確認してください。
+4. 問題がなければ審査申請へ進んでください。
+5. アップロード時にエラーが出た場合は、ZIPを自分で作り直さず、表示されたエラー文または画面のスクリーンショットをこの会話へ送ってください。
+
+**「8個入りのシート画像は確認用です。LINEへ提出するのは、今添付したZIPファイルです。ZIP内のPNGを個別に保存し直したり、画像編集アプリで開いて上書きしたりしないでください。」**
+
+端末によって保存場所が異なるため、保存先を断定してはいけません。保存方法を尋ねられた場合のみ、iPhone、Android、パソコンのどれを使っているか確認し、その端末に合わせて案内してください。
+
+内部処理や長い検査ログは表示しないでください。ただし、上記のユーザー操作案内は省略してはいけません。
+
+ファイル加工機能またはZIP添付機能が使えない場合は、次のように表示してください。
+
+**「画像40種類は生成できましたが、この環境では提出用PNGへの分割・検査・ZIP添付を実行できません。8個入りシート画像はLINEへ直接アップロードできません。」**
+
+この一文だけで終了せず、続けて次のように表示してください。
+
+**「次に行うこと」**
+
+1. この会話で生成したSET 1〜SET 5のシート画像を、5枚とも端末へ保存してください。
+2. 可能なら`set1.png`〜`set5.png`という名前にしてください。名前を変更できなくても、5枚すべて保存できていれば構いません。
+3. 画像加工とZIP作成ができる環境へ5枚をまとめて添付してください。
+4. その環境で、次の依頼文を送ってください。
+
+```text
+添付したSET 1〜SET 5の5枚のシート画像から、番号順に001.png〜040.pngへ分割してください。各画像を180×180pxの透過PNGにし、代表画像から96×74pxのtab.pngも作成してください。ZIP直下に001.png〜040.pngとtab.pngだけを入れ、サイズ、透過、容量、欠番、不要ファイルの有無を検査したうえで、LINE Creators Market提出用ZIPを添付してください。
+```
+
+5. ZIPを受け取ったら、ZIPを解凍・再圧縮せずLINE Creators Marketへアップロードしてください。
+
+SET画像が5枚そろっていない場合は、不足しているSET番号を明示してください。
+
+存在しないダウンロードリンクを作ってはいけません。
+
+ユーザーから「このあとどうするの」「どれを提出するの」「保存できない」「エラーが出た」と聞かれた場合は、完成報告を繰り返すだけでなく、状況に合わせて次のように対応してください。
+
+- 「どれを提出するの」→ 添付したZIPだけを提出すると明示する
+- 「シート画像も必要か」→ シート画像は確認用であり提出不要と答える
+- 「ZIPを解凍するのか」→ 原則として解凍せず、そのままアップロードすると答える
+- 「保存できない」→ 使用端末を確認し、その端末での保存操作を順番に案内する
+- 「アップロードエラー」→ エラー文またはスクリーンショットの送付を依頼し、ZIPの内部構成から原因を診断する
+- 「画像を直したい」→ 修正対象の番号を確認し、そのPNGだけを修正した後、ZIP全体を再作成・再検査する
+
+LINE Creators Marketへの登録や審査申請まで案内する場合は、現在表示されている画面を確認しながら1画面ずつ進めてください。画面を見ていない状態で、実際と異なるボタン名や配置を断定してはいけません。
+
+---
+
+# 39. ZIPエラー時の自己診断
+
+ZIPの作成またはアップロードでエラーが発生した場合は、最初から画像を再生成せず、次の順番で原因を確認してください。
+
+1. tab.pngが存在するか
+2. 001.png〜040.pngが欠番なく存在するか
+3. ファイル名が半角3桁になっているか
+4. PNGがすべて180×180pxか
+5. tab.pngが96×74pxか
+6. すべて実際にPNG形式か
+7. 背景が実際に透過されているか
+8. 各PNGが1MB以下か
+9. ZIPが20MB以下か
+10. ZIP内に親フォルダ、隠しファイル、シート画像などが入っていないか
+11. ZIP自体が破損していないか
+12. 外周8pxと四隅12×12pxが完全透明か
+13. 上端などに黒い異物や隣セルの断片が残っていないか
+14. 四角い背景面や透過漏れが残っていないか
+
+原因を修正した後、ZIPを作り直して再検査してください。
+
+---
+
+# 40. 最重要原則
+
+必ず守る：
+
+- 本制作は動かない静止PNG40個であり、APNGやアニメーションへ変更しない
+- ユーザーへ入力ZIPや外部キットを要求せず、このプロンプト単体で開始する
+- ユーザー操作は A/B/C → 生成 → 次 → 次 → 次 → 次 → zipファイルにして
+- キャラクター確定後に新案を再提案しない
+- 40個の設計を最初に固定する
+- SET進行は固定遷移だけ
+- 過去SETを再生成しない
+- SET 1〜4はCHARACTER MODE
+- SET 5はSYMBOL MODE
+- 1SET＝8個入り画像を1枚
+- CHARACTER MASTERを固定
+- COLOR MASTERを固定
+- REFERENCE CHARACTERを固定
+- REFERENCE COLORを固定
+- 毎SETで形と色を基準へ戻す
+- キャラクター本体の配色を勝手に変えない
+- SET 5ではCHARACTER MODEを完全OFF
+- SET 5ではREFERENCE CHARACTERを使わない
+- SET 5ではキャラクター情報をIMAGE PROMPTへ入れない
+- SET 5は記号・エフェクトだけ
+- ユーザーに内部管理を見せない
+- 無駄な確認で1ターン使わない
+- 8個入りシートは提出データではない
+- 40枚すべてを180×180pxの個別PNGにする
+- tab.pngを96×74pxで作る
+- ZIP直下は001.png〜040.pngとtab.pngだけにする
+- 各PNGは1MB以下、ZIPは20MB以下にする
+- 背景が実際に透過されていることをアルファ値で検査する
+- 全40枚で外周8px、四隅12×12px、見切れ、異物、隣セル混入、背景面、色縁を検査する
+- 不合格番号だけを修正し、合格済み番号を再生成しない
+- ZIPを開き直してから完成判定する
+- 実ファイルを作れない環境では完成したと報告しない
+- 画像生成後の案内に依存せず、生成開始前に全操作を説明する
+- A/B/C以外の自由指定も正式なキャラクター選択として受け付ける
+- キャラクター選択直後は画像を生成せず、「生成」を待つ
+- 最初の生成画像は必ず001〜008の2段×4列SET 1にする
+- 単体立ち絵、背景付きイラスト、確認用キャラクター画像を先に生成しない
+- 無関係な人物、動物、背景、過去画像をキャラクターへ混ぜない
+- SET 5後は自動でZIP作成へ進まず、「zipファイルにして」を待つ
+- 「zipファイルにして」を受け取ってから提出用データ作成を開始する
+- ZIP完成後は、保存、アップロード、プレビュー確認、エラー時の戻り方まで案内する
+- ZIPを作れない場合は、5枚のSET画像の保存方法と別環境への引き継ぎ文を案内する
+- 完成報告だけで終わらず、ユーザーが次に行う操作を必ず示す
+
+最も避けるべきなのは、
+
+- 001〜008の後にまた001〜008を出す
+- SET途中で別キャラクターになる
+- SET途中で色が変わる
+- SET 5にキャラクターが出る
+- SET 4の内容がSET 5に混ざる
+- 過去SETの意味・ポーズを再利用する
+- 8個入りシートをそのまま提出する
+- tab.pngがないZIPを作る
+- 親フォルダや隠しファイルをZIPへ入れる
+- 透過されていない画像を完成扱いにする
+- 上端の黒い塊、隣セルの断片、色付き四角背景を残したまま完成扱いにする
+- 異物を自動消去して正常な髪・輪郭・エフェクトまで壊す
+- 静止絵文字をAPNGや20フレームの動く絵文字として制作する
+- ZIPを検査せず完成と報告する
+- ユーザーに内部処理を説明しすぎる
+
+ことです。</pre>
+    </div>
+    <p class="prompt-scroll-hint">↑ 中身は上下にスクロールして確認できます</p>
+
+    <div class="sec-head" style="margin-top:40px;margin-bottom:18px;">
+      <h2 style="font-size:18px;">40種類そろったあと</h2>
+    </div>
+
+    <ol class="apply-list">
+      <li>
+        <h4>全体をひととおり見る</h4>
+        <p>8個入りのシート画像が5枚そろいます。キャラクターの形と色がそろっているか、同じような表情ばかりになっていないかを見て、直したいものだけ<strong>番号で伝える</strong>流れです（例：「011だけ修正」「015をもっと怒らせて」）。その番号だけを1個で作り直してくれます。</p>
+      </li>
+      <li>
+        <h4>「zipファイルにして」と送る</h4>
+        <p>5枚そろったら、最後に<strong>「zipファイルにして」</strong>と送ります。ここは自動では始まりません。40個を1枚ずつのPNGに切り分け、<strong>180×180px</strong>にそろえ、背景を透明にして、トークルームタブ画像（<strong>96×74pxのtab.png</strong>）も作り、41ファイルのZIPにまとめるところまで指示に入っています。</p>
+      </li>
+      <li>
+        <h4>「できません」と言われたら別の場所で作る</h4>
+        <p>スマホのChatGPTでは、画像の切り分けやZIPの作成ができないことがある点に注意が必要です。そのときは<strong>できないと正直に返したうえで、5枚のシート画像をパソコンのAIに渡すための依頼文</strong>まで出すようにしてあります。8個入りのシート画像は、そのままではLINEへ提出できません。</p>
+      </li>
+      <li>
+        <h4>LINE Creators Marketで登録する</h4>
+        <p>スマホのブラウザからの登録が可能です。種類は<strong>「絵文字」</strong>（動くほうではありません）を選びます。ZIPは<strong>解凍せずそのまま</strong>アップロードします。エラーが出た場合は、その文面をそのままChatGPTへ送れば原因を調べてくれます。</p>
+      </li>
+    </ol>
+
+    <div class="note-yellow">
+      <span class="ico">⚠️</span>
+      <p>
+        このプロンプトが作るのは<strong>LINE絵文字</strong>です。トークの文章にまぎれて使うものなので、画像の中に「ありがとう」などの文字は入れません。表情とポーズ、それに<strong>❗❓✨💦のような記号だけの絵文字8種類</strong>で意味を伝えます。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ つまずき ============ -->
+  <section style="background:#fdf4f0;border-top:1px solid var(--line);">
+    <div class="sec-head">
+      <span class="pill-soft">先に知っておくと安心</span>
+      <h2 style="margin-top:12px;">🚧 よくあるつまずき</h2>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>背景に白い四角が残ってしまう</p>
+      <p class="a">画像生成AIは、透明な背景が苦手です。そこでこのプロンプトでは、いったん<strong>真緑の背景で描かせてから、その色だけを抜く</strong>やり方をとっています。緑のフチが残っていないかも自動検査の対象です。</p>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>動かしたら絵の端が切れた</p>
+      <p class="a">180pxの枠いっぱいに描くと、跳ねたり回したりしたときにはみ出します。元絵の段階で上下左右に余白を取るのが正解です。プロンプトにもその指示を入れてあります。</p>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>容量オーバーでアップできない</p>
+      <p class="a">1個300KBは、動く画像としてはかなり小さめです。コマ数を減らす、色数を減らす、動きの幅を小さくする、の順で軽くします。ここもCodexが自動で対応する範囲です。</p>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>小さすぎて何の絵か分からない</p>
+      <p class="a">絵文字はトーク画面で本当に小さく表示されます。パソコンの画面で見て「ちょっと大げさかな」くらいが、実機ではちょうどよく見える加減です。プロンプト側でも、24〜32px相当で意味が分かるかを確認する指示を入れています。</p>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>途中から顔が別人になる</p>
+      <p class="a">40個も作ると、AIは少しずつ絵柄をずらしていくものです。だから最初に決めたデザインを設定ファイルに書き出して固定し、<strong>基準と違う絵が出たら採用しない</strong>ルールにしてあります。</p>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>権利まわりが不安</p>
+      <p class="a">既存のキャラクターやロゴ、実在の人物に似せたものは審査で止まる仕組みです。使った画像生成AIの規約で商用利用が認められているかも、先に確認しておいてください。</p>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>再生時間が1.2秒だと弾かれる</p>
+      <p class="a">実際にアップロードして分かったことですが、<strong>1ループはちょうど1秒・2秒・3秒・4秒</strong>でないと通りません。滑らかさは秒数ではなく、コマの配分と1枚ごとの表示時間で作ります。</p>
+    </div>
+
+    <div class="trap">
+      <p class="q"><span class="ico">😵</span>ZIPの中身が違ってアップできない</p>
+      <p class="a">ZIPの直下に<strong>連番の絵文字とtab.pngだけ</strong>が並んでいることが条件です。Macで圧縮したときに混ざる __MACOSX や .DS_Store も原因になります。プロンプトでは、渡すZIPそのものを開き直して中身を数える検査を最後に組み込んである設計です。</p>
+    </div>
+  </section>
+
+  <!-- ============ 正直な話 ============ -->
+  <section class="dark-sec">
+    <h2>⚠️ でも、正直にお伝えします。</h2>
+
+    <div class="body">
+      ここまで読んで、「プロンプトが手に入ったから自分にもできそう」と思ってもらえたなら嬉しいです。<br><br>
+      ただ、正直にお伝えしておきたいことがあります。<br>
+      <span class="u">「1セット作れること」と「使ってもらえるものを出し続けること」は、まったく別の話です。</span>
+    </div>
+
+    <ul>
+      <li><span class="ico">🤔</span><span>数ある絵文字の中から、どうやって見つけてもらうのか？</span></li>
+      <li><span class="ico">🤔</span><span>「かわいい」で終わらず、毎日使われる言葉は何なのか？</span></li>
+      <li><span class="ico">🤔</span><span>1セット出したあと、次に何を出せばいいのか？</span></li>
+    </ul>
+
+    <p class="closing">
+      作り方が分かった後、ここでつまずいて<br>止まってしまう方がいちばん多いんです。
+    </p>
+  </section>
+
+  <!-- ============ LINE CTA ============ -->
+  <section class="cta">
+    <div class="cta-badge-wrap">
+      <span class="cta-badge">遠回りしたくないあなたへ。<br>特別なプレゼント</span>
+    </div>
+
+    <p class="cta-hook">
+      AIで収益化するために<br>実際に踏んだステップと考え方を<br>1つにまとめた
+      <span class="big">『AI収益化の無料レポート』</span>
+      を、期間限定で公開しています。
+    </p>
+
+    <div class="cta-card">
+      <span class="tag">無料プレゼント中🎁</span>
+      <h3>レポートの中身</h3>
+
+      <div class="inner">
+        <p class="t">📖 少しだけご紹介します</p>
+        <ul>
+          <li><span class="ico">💎</span><span><strong>第1章：</strong>いま一番始めやすいAIマネタイズ手法</span></li>
+          <li><span class="ico">💎</span><span><strong>第2章：</strong>そのまま使える収益化プロンプト集</span></li>
+          <li><span class="ico">💎</span><span><strong>第3章：</strong>作業時間を短くするテンプレート</span></li>
+          <li><span class="ico">💎</span><span><strong>第4章：</strong>目的別・生成AIツールの選び方</span></li>
+          <li><span class="ico">💎</span><span><strong>第5章：</strong>AI×SNSで収益を生んだ実例</span></li>
+        </ul>
+      </div>
+
+      <p class="after">
+        自己流だとかならず止まってしまうポイントを、<br>
+        先に潰しておけるようにまとめました。
+      </p>
+    </div>
+
+    <div class="cta-tail">
+      <p class="lead">
+        ・興味があるけど、何から始めたらいいわからない<br>
+        ・今からじゃもう遅い？<br>
+        そう思っている人でも大丈夫です。<br>
+        私も54歳からAIを使い始めました。<br>
+        思い立った今が、小さな行動をする最高のチャンスです。<br>
+        🌷自分の身は自分で守る！🌷
+        <span class="em">受け取りたい方は下の公式LINEで無料で受け取るを<br>タップして受け取ってくださいね🌷</span>
+      </p>
+
+      <a class="line-btn" id="lineCta" href="https://utage-system.com/line/open/uukg47XG0D5R?mtid=cwjhpKR2ZFq2" target="_blank" rel="noopener">
+        <span class="tap">＼ タップして ／</span>
+        <span class="main">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.929 10.318C23.929 4.622 18.571 0 11.96 0 5.351 0 0 4.622 0 10.318c0 5.093 4.148 9.387 9.873 10.155.39.083.91.24 1.047.55.123.277.08.625.04.86-.06.337-.384 2.29-.444 2.65-.098.583.473.81.93.593 1.134-.54 6.104-3.594 8.784-6.494 2.45-2.656 3.7-5.467 3.7-8.314z"/></svg>
+          公式LINEで無料で受け取る
+        </span>
+      </a>
+
+      <p class="cta-fine">
+        ※ 最新のAI事情に合わせた内容のため、期間限定での配布となります。予告なく終了する場合がありますので、お早めにお受け取りください。配信はいつでも解除できます。
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    <p>動くLINE絵文字の作り方ガイド ／ Codex用プロンプト付き</p>
+    <p>本ページの内容は制作手順の解説であり、審査の通過や収益を保証するものではありません。成果は個人の状況により異なります。</p>
+    <p>LINE Creators Marketの仕様・審査基準・分配条件は変更される場合がある点にご注意ください。申請前に公式サイトで最新の内容を確認しておきましょう。</p>
+    <p>LINEは、LINEヤフー株式会社の商標または登録商標です。本ページは同社とは関係のない個人が作成した非公式の解説になります。</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toastText');
+  var timer = null;
+
+  function showToast(msg){
+    toastText.textContent = msg;
+    toast.classList.remove('show');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function(){ toast.classList.remove('show'); }, 2000);
+  }
+
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  var buttons = document.querySelectorAll('[data-copy-target]');
+  Array.prototype.forEach.call(buttons, function(btn){
+    btn.addEventListener('click', function(){
+      var src = document.getElementById(btn.getAttribute('data-copy-target'));
+      if(!src) return;
+      var text = src.textContent;
+      var msg = (text.length > 200) ? 'プロンプトをコピーしました！' : 'コピー完了！';
+
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(function(){
+          showToast(msg);
+        }).catch(function(){
+          if(fallbackCopy(text)) showToast(msg);
+        });
+      } else {
+        if(fallbackCopy(text)) showToast(msg);
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
