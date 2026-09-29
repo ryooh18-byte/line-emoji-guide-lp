@@ -130,6 +130,37 @@
   .c-primary{ color:var(--primary-d); }
   .c-red{ color:#e23b3b; }
 
+  /* ---------- 著者あいさつ＋バナー ---------- */
+  .author-intro{
+    padding:26px 22px 22px;
+    text-align:center;
+    background:#fff;
+  }
+  .author-greeting{
+    margin:0 0 10px;
+    font-size:14.5px;
+    line-height:1.9;
+    color:var(--ink);
+    font-weight:700;
+  }
+  .author-greeting:last-of-type{ margin-bottom:20px; }
+  .banner-link{
+    display:block;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 10px 26px -16px rgba(80,55,60,.6);
+    transition:transform .15s, filter .2s;
+  }
+  .banner-link:active{ transform:scale(.98); filter:brightness(.97); }
+  @media (hover:hover){
+    .banner-link:hover{ filter:brightness(1.03); }
+  }
+  .banner-img{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+
   /* ---------- ヘッダー ---------- */
   header.hero{
     background:linear-gradient(150deg,#fdf1ec 0%,#fdf3ee 100%);
@@ -994,6 +1025,15 @@
 </div>
 
 <div class="shell">
+
+  <!-- ============ 著者あいさつ＋バナー ============ -->
+  <section class="author-intro">
+    <p class="author-greeting">くみです。見てくださってありがとうございます。</p>
+    <p class="author-greeting">今回は、50代独身女子の私でもできた、AIを使って動くLINE絵文字を簡単に作る方法をお伝えしますね。</p>
+    <a class="banner-link" href="https://utage-system.com/line/open/uukg47XG0D5R?mtid=cwjhpKR2ZFq2" target="_blank" rel="noopener">
+      <img class="banner-img" src="ai-sidejob-banner.webp" alt="AI副業の完全ガイド AIワーク0-1達成スタートブック 5大特典無料プレゼント 50代から始める、AIを使ったおうちワーク 今すぐ受け取る">
+    </a>
+  </section>
 
   <!-- ============ ヘッダー ============ -->
   <header class="hero">
