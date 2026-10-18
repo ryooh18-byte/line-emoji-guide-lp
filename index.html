@@ -1015,7 +1015,10 @@
     header.hero{ padding:44px 32px 52px; }
     .dark-sec, .cta{ padding:64px 32px; }
   }
-</style>
+    /* 日本語の折り返し：文節で区切り、見出しは行の長さをそろえる */
+    body{word-break:auto-phrase;line-break:strict}
+    p,li,td,th,summary,h1,h2,h3,.note,.rule p,.completion b,.bridge-lead{text-wrap:pretty}
+  </style>
 </head>
 <body>
 
