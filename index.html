@@ -3929,14 +3929,15 @@ ZIPの作成またはアップロードでエラーが発生した場合は、�
       var text = src.textContent;
       var msg = (text.length > 200) ? 'プロンプトをコピーしました！' : 'コピー完了！';
 
+      var failMsg = 'コピーできませんでした。文章を選択してコピーしてください';
       if(navigator.clipboard && navigator.clipboard.writeText){
         navigator.clipboard.writeText(text).then(function(){
           showToast(msg);
         }).catch(function(){
-          if(fallbackCopy(text)) showToast(msg);
+          showToast(fallbackCopy(text) ? msg : failMsg);
         });
       } else {
-        if(fallbackCopy(text)) showToast(msg);
+        showToast(fallbackCopy(text) ? msg : failMsg);
       }
     });
   });
