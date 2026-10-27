@@ -1,4 +1,5 @@
 # line-emoji-guide-lp
 
 ## 公開先URL
-未定（元はClaude Artifactとして作成）
+- https://ryooh18-byte.github.io/line-emoji-guide-lp/
+  （GitHub Pages・公開中）
