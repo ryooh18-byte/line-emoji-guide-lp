@@ -915,44 +915,6 @@
     box-shadow:0 4px 12px -10px rgba(80,55,60,.8);
   }
 
-  .line-btn{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    background:var(--line-green);
-    color:#fff;
-    text-decoration:none;
-    border-radius:18px;
-    padding:15px 18px;
-    box-shadow:0 16px 32px -14px rgba(6,199,85,.75);
-    position:relative;
-    overflow:hidden;
-    animation:bounceSlow 2.6s ease-in-out infinite;
-    transition:transform .15s, filter .2s;
-  }
-  .line-btn:active{ transform:scale(.97); filter:brightness(.96); }
-  @media (hover:hover){
-    .line-btn:hover{ filter:brightness(1.05); }
-  }
-  .line-btn .tap{
-    font-size:11.5px;
-    font-weight:700;
-    background:rgba(255,255,255,.22);
-    border-radius:999px;
-    padding:2px 14px;
-    margin-bottom:7px;
-  }
-  .line-btn .main{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    font-size:16.5px;
-    font-weight:900;
-  }
-  .line-btn .main svg{ width:23px;height:23px;flex-shrink:0; }
-
   .cta-fine{
     margin:14px 0 0;
     font-size:11px;
@@ -1108,46 +1070,11 @@
     </div>
   </section>
 
-  <!-- ============ 全体像 ============ -->
-  <section style="background:linear-gradient(180deg,#ffffff,#fdf4f0);">
-    <div class="sec-head">
-      <span class="pill-soft">まずは全体像から</span>
-      <h2 style="margin-top:12px;">たった4ステップで<br>販売申請までいけます🎉</h2>
-    </div>
-
-    <div class="flow-overview">
-      <div class="flow-row">
-        <span class="flow-dot">💻</span>
-        <span class="lbl">Codexを準備する<small>入れてサインインするだけ</small></span>
-      </div>
-      <div class="flow-row">
-        <span class="flow-dot">📋</span>
-        <span class="lbl">プロンプトを貼る<small>下のボタンでコピーするだけ</small></span>
-      </div>
-      <div class="flow-row">
-        <span class="flow-dot">💬</span>
-        <span class="lbl">デザイン案を選ぶ<small>3案から選ぶ、または「おまかせ」</small></span>
-      </div>
-      <div class="flow-row">
-        <span class="flow-dot">🛒</span>
-        <span class="lbl">LINEに申請する<small>できたZIPをアップするだけ</small></span>
-      </div>
-    </div>
-
-    <div class="note-soft">
-      <p>
-        このプロンプトは、指定がなければ<strong>40個のフルセット</strong>で組み立てる仕様です。<br>
-        「ありがとう」「了解」「おつかれ」など、<br>
-        <strong class="c-red">日常で本当に使われる言葉から先に埋まります。</strong>
-      </p>
-    </div>
-  </section>
-
-  <!-- ============ STEP 1 Codex導入 ============ -->
+  <!-- ============ 下準備 Codex導入 ============ -->
   <section>
     <div class="sec-head">
-      <span class="step-label">STEP 1</span>
-      <h2>💻 Codexを準備する</h2>
+      <span class="step-label">まずは下準備。</span>
+      <h2>💻 Codexを使えるようにしよう</h2>
       <p class="lead">
         Codexは、OpenAIが出している「パソコンの中で作業してくれるAI」です。<br>
         ChatGPTと違って<strong>ファイルを実際に作れる</strong>ので、<br>
@@ -1220,10 +1147,40 @@
     </div>
   </section>
 
-  <!-- ============ STEP 2 プロンプト ============ -->
+  <!-- ============ 全体像 ============ -->
+  <section style="background:linear-gradient(180deg,#ffffff,#fdf4f0);">
+    <div class="sec-head">
+      <h2>あとは簡単3ステップで<br>販売申請までいけます🎉</h2>
+    </div>
+
+    <div class="flow-overview">
+      <div class="flow-row">
+        <span class="flow-dot">📋</span>
+        <span class="lbl">プロンプトを貼る<small>下のボタンでコピーするだけ</small></span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-dot">💬</span>
+        <span class="lbl">デザイン案を選ぶ<small>3案から選ぶ、または「おまかせ」</small></span>
+      </div>
+      <div class="flow-row">
+        <span class="flow-dot">🛒</span>
+        <span class="lbl">LINEに申請する<small>できたZIPをアップするだけ</small></span>
+      </div>
+    </div>
+
+    <div class="note-soft">
+      <p>
+        このプロンプトは、指定がなければ<strong>40個のフルセット</strong>で組み立てる仕様です。<br>
+        「ありがとう」「了解」「おつかれ」など、<br>
+        <strong class="c-red">日常で本当に使われる言葉から先に埋まります。</strong>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ STEP 1 プロンプト ============ -->
   <section style="background:#fdf4f0;border-top:1px solid var(--line);">
     <div class="sec-head">
-      <span class="step-label">STEP 2</span>
+      <span class="step-label">STEP 1</span>
       <h2>📋 このプロンプトを貼る</h2>
       <p class="lead">
         Codexが起動したら、下のボタンでコピーして<br>
@@ -2107,10 +2064,10 @@ python3 scripts/validate_submission_zip.py LINE_READY.zip --expected-count 40 --
     </div>
   </section>
 
-  <!-- ============ STEP 3 対話 ============ -->
+  <!-- ============ STEP 2 対話 ============ -->
   <section>
     <div class="sec-head">
-      <span class="step-label">STEP 3</span>
+      <span class="step-label">STEP 2</span>
       <h2>💬 デザインを決めたら<br>あとは待つだけ</h2>
       <p class="lead">
         実際にはこんな順番で進む流れです。<br>
@@ -2272,10 +2229,10 @@ python3 scripts/validate_submission_zip.py LINE_READY.zip --expected-count 40 --
     <p class="ext-note">LINE Creators Market公式の制作ガイドラインのページです。</p>
   </section>
 
-  <!-- ============ STEP 4 申請 ============ -->
+  <!-- ============ STEP 3 申請 ============ -->
   <section>
     <div class="sec-head">
-      <span class="step-label">STEP 4</span>
+      <span class="step-label">STEP 3</span>
       <h2>🛒 LINEに申請する</h2>
       <p class="lead">
         ファイルができたら、あとは登録するだけ。<br>
@@ -2298,7 +2255,7 @@ python3 scripts/validate_submission_zip.py LINE_READY.zip --expected-count 40 --
       </li>
       <li>
         <h4>画像をアップロードする</h4>
-        <p>作成したZIPをアップロードする工程です。<br>ここでサイズ・容量・再生時間が合わないとエラーが出ますが、STEP 3までで自動チェックを済ませてあります。</p>
+        <p>作成したZIPをアップロードする工程です。<br>ここでサイズ・容量・再生時間が合わないとエラーが出ますが、STEP 2までで自動チェックを済ませてあります。</p>
         <p>売り場に出るメイン画像は、アップした絵文字から<strong>4個を選んで管理画面で作ります</strong>。<br>自分で用意する必要はありません。</p>
       </li>
       <li>
@@ -2332,7 +2289,7 @@ python3 scripts/validate_submission_zip.py LINE_READY.zip --expected-count 40 --
     <div class="note-yellow">
       <span class="ico">💡</span>
       <p>
-        STEP1〜4で使ったCodexは「決まったデザインを正確に作る」担当です。<br>今の情報を検索する必要があるこのプロンプトは、<strong>ChatGPTの通常チャット（Web検索がオンの状態）</strong>に貼ってください。<br>Codexアプリに貼っても検索は行われません。
+        STEP1〜3で使ったCodexは「決まったデザインを正確に作る」担当です。<br>今の情報を検索する必要があるこのプロンプトは、<strong>ChatGPTの通常チャット（Web検索がオンの状態）</strong>に貼ってください。<br>Codexアプリに貼っても検索は行われません。
       </p>
     </div>
 
@@ -3866,15 +3823,11 @@ ZIPの作成またはアップロードでエラーが発生した場合は、�
         私も54歳からAIを使い始めました。<br>
         思い立った今が、小さな行動をする最高のチャンスです。<br>
         🌷自分の身は自分で守る！🌷
-        <span class="em">受け取りたい方は下の公式LINEで無料で受け取るを<br>タップして受け取ってくださいね🌷</span>
+        <span class="em">「今すぐ受け取る」を押して<br>受け取ってくださいね🌷</span>
       </p>
 
-      <a class="line-btn" id="lineCta" href="https://sub.aione.co.jp/line/open/QFSiLvkqYbDv?mtid=LjfkfFq0NU0O" target="_blank" rel="noopener">
-        <span class="tap">＼ タップして ／</span>
-        <span class="main">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.929 10.318C23.929 4.622 18.571 0 11.96 0 5.351 0 0 4.622 0 10.318c0 5.093 4.148 9.387 9.873 10.155.39.083.91.24 1.047.55.123.277.08.625.04.86-.06.337-.384 2.29-.444 2.65-.098.583.473.81.93.593 1.134-.54 6.104-3.594 8.784-6.494 2.45-2.656 3.7-5.467 3.7-8.314z"/></svg>
-          公式LINEで無料で受け取る
-        </span>
+      <a class="banner-link" href="https://sub.aione.co.jp/line/open/QFSiLvkqYbDv?mtid=LjfkfFq0NU0O" target="_blank" rel="noopener">
+        <img class="banner-img" src="ai-sidejob-banner.webp" alt="AI副業の完全ガイド AIワーク0-1達成スタートブック 5大特典無料プレゼント 50代から始める、AIを使ったおうちワーク 今すぐ受け取る">
       </a>
 
       <p class="cta-fine">
